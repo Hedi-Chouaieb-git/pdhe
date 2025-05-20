@@ -1,0 +1,164 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Liste des étudiants - {{ course.title }}{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/courses.css' %}">
+<style>
+    /* Styles pour la liste des étudiants */
+    .student-card {
+        border: 1px solid #e0e0e0;
+        border-radius: 10px;
+        transition: all 0.3s ease;
+        margin-bottom: 15px;
+        background: white;
+    }
+    
+    .student-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+    }
+    
+    .student-avatar {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        background: #f0f4f8;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 600;
+        color: #226D68;
+        font-size: 1.2rem;
+    }
+    
+    .student-info h6 {
+        font-weight: 600;
+        margin-bottom: 2px;
+        color: #333;
+    }
+    
+    .student-email {
+        font-size: 0.8rem;
+        color: #6c757d;
+    }
+    
+    .student-stats {
+        font-size: 0.85rem;
+        color: #6c757d;
+    }
+    
+    .student-actions .btn {
+        padding: 0.25rem 0.5rem;
+        font-size: 0.8rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="h4 mb-1">{{ course.title }}</h2>
+            <p class="text-muted mb-0">Liste des étudiants inscrits</p>
+        </div>
+        <a href="{% url 'courses:course_detail' course.pk %}" class="btn btn-outline-secondary btn-sm">
+            <i class="fas fa-arrow-left me-1"></i> Retour au cours
+        </a>
+    </div>
+
+    <div class="card shadow-sm mb-4">
+        <div class="card-header bg-white d-flex justify-content-between align-items-center py-3">
+            <h5 class="mb-0">
+                <i class="fas fa-users text-primary me-2"></i>Étudiants inscrits
+                <span class="badge bg-primary ms-2">{{ students.count }}</span>
+            </h5>
+            {% if user == course.teacher or user.is_superuser %}
+                <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#addStudentModal">
+                    <i class="fas fa-user-plus me-1"></i> Ajouter un étudiant
+                </button>
+            {% endif %}
+        </div>
+        <div class="card-body p-0">
+            {% if students %}
+                <div class="list-group list-group-flush">
+                    {% for student in students %}
+                        <div class="list-group-item p-3">
+                            <div class="d-flex align-items-center">
+                                <div class="student-avatar me-3">
+                                      {{ student.first_name|first|upper }}{% if student.last_name %}{{ student.last_name|first|upper }}{% else %}{{ student.username|first|upper }}{% endif %}
+                                </div>
+                                <div class="student-info flex-grow-1">
+                                    <h6 class="mb-1">
+                                        {% if student.get_full_name %}
+                                            {{ student.get_full_name }}
+                                        {% else %}
+                                            {{ student.username }}
+                                        {% endif %}
+                                            </h6>
+                                            <small class="text-muted">
+                                                {% if student.email %}
+                                                    {{ student.email }}
+                                                {% else %}
+                                                    {{ student.username }}
+                                                {% endif %}
+                                            </small>
+                                        </div>
+                                        {% if user == course.teacher or user.is_superuser %}
+                                            <form method="post" action="{% url 'courses:unroll_course' course.pk %}" class="ms-2">
+                                                <input type="hidden" name="student_id" value="{{ student.id }}">
+                                                {% csrf_token %}
+                                                <button type="submit" class="btn btn-sm btn-outline-danger" title="Retirer du cours">
+                                                    <i class="fas fa-user-minus"></i>
+                                                </button>
+                                            </form>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="text-center py-4">
+                            <div class="mb-3">
+                                <i class="fas fa-users-slash fa-3x text-muted"></i>
+                            </div>
+                            <p class="text-muted mb-0">Aucun étudiant n'est inscrit à ce cours</p>
+                            {% if user == course.teacher or user.is_superuser %}
+                                <a href="#" class="btn btn-sm btn-outline-primary mt-2" data-bs-toggle="modal" data-bs-target="#addStudentModal">
+                                    <i class="fas fa-user-plus me-1"></i> Ajouter des étudiants
+                                </a>
+                            {% endif %}
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal d'ajout d'étudiant -->
+    {% if user == course.teacher or user.is_superuser %}
+    <div class="modal fade" id="addStudentModal" tabindex="-1" aria-labelledby="addStudentModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addStudentModalLabel">Ajouter des étudiants</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
+                </div>
+                <div class="modal-body">
+                    <form method="post" action="{% url 'courses:course_students_list' course.pk %}" class="mb-3">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label for="access_key" class="form-label">Clé d'accès</label>
+                            <input type="text" class="form-control" id="access_key" name="access_key" placeholder="Entrez la clé d'accès" required>
+                            <div class="form-text">Demandez à l'étudiant de vous fournir sa clé d'accès personnelle.</div>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Ajouter l'étudiant</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

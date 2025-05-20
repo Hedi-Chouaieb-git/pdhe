@@ -1,0 +1,222 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/courses.css' %}">
+<style>
+    /* Styles identiques à course_list.html */
+    .course-card {
+        border: 1px solid #e0e0e0;
+        border-radius: 12px;
+        overflow: hidden;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .course-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 15px rgba(0,0,0,0.1);
+    }
+
+    .course-header {
+        position: relative;
+        height: 0;
+        padding-bottom: 30%;
+        background: linear-gradient(135deg, #226D68 0%, #1a534f 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+    }
+
+    .course-icon {
+        font-size: 1.5rem;
+        opacity: 0.8;
+    }
+
+    .btn-view {
+        position: absolute;
+        bottom: -15px;
+        right: 15px;
+        background: white;
+        color: #226D68;
+        border-radius: 20px;
+        padding: 3px 12px;
+        font-size: 0.7rem;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+
+    .card-content {
+        padding: 0.75rem;
+        flex-grow: 1;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .card-title {
+        font-size: 1rem;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+        color: #333;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .card-text {
+        color: #6c757d;
+        font-size: 0.75rem;
+        margin: 0.5rem 0;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        line-height: 1.3;
+    }
+
+    .badge-level {
+        position: absolute;
+        top: 10px;
+        left: 10px;
+        font-size: 0.7rem;
+        font-weight: 500;
+    }
+
+    .badge-new {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        background: #ff6b6b;
+        font-size: 0.7rem;
+    }
+
+    .course-meta {
+        display: flex;
+        align-items: center;
+        margin-top: 0.5rem;
+        padding-top: 0.5rem;
+        border-top: 1px solid #f0f0f0;
+    }
+
+    .teacher-avatar {
+        width: 26px;
+        height: 26px;
+        border-radius: 50%;
+        margin-right: 8px;
+        object-fit: cover;
+    }
+
+    .course-stats {
+        display: flex;
+        justify-content: space-between;
+        color: #6c757d;
+        font-size: 0.7rem;
+        padding: 0.4rem 0.75rem;
+        border-top: 1px solid #f0f0f0;
+        background: #f9f9f9;
+    }
+
+    .teacher-name {
+        font-size: 0.8rem;
+        color: #495057;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="mb-1">Mes Cours</h2>
+            <p class="text-muted mb-0">Retrouvez ici tous les cours auxquels vous êtes inscrit</p>
+        </div>
+        <div>
+            <a href="{% url 'courses:course_list' %}" class="btn btn-outline-teal">
+                <i class="fas fa-book-open me-2"></i>Découvrir d'autres cours
+            </a>
+        </div>
+    </div>
+
+    {% if courses %}
+    <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4">
+        {% for course in courses %}
+        <div class="col">
+            <div class="course-card">
+                <a href="{% url 'courses:course_detail' course.pk %}" class="text-decoration-none text-body">
+                    <div class="course-header">
+                        {% if course.is_new %}
+                        <span class="badge badge-new">Nouveau</span>
+                        {% endif %}
+                        <span class="badge badge-level">{{ course.get_level_display }}</span>
+                        <div class="course-icon">
+                            <i class="fas fa-book-open"></i>
+                        </div>
+                        <span class="btn-view">
+                            <i class="fas fa-eye me-1"></i> Voir
+                        </span>
+                    </div>
+
+                                <div class="card-content">
+                                    <div class="card-body">
+                                        <div class="d-flex justify-content-between align-items-start mb-3">
+                                            <span class="badge-level">
+                                                <i class="fas fa-chart-line me-1"></i>{{ course.get_level_display }}
+                                            </span>
+                                            {% if course.is_new %}
+                                            <span class="badge-new">Nouveau</span>
+                                            {% endif %}
+                                        </div>
+
+                                        <h3 class="h5 fw-bold mb-3">{{ course.title }}</h3>
+                                        <p class="text-muted mb-3">{{ course.description|truncatewords:20 }}</p>
+
+                                        <div class="course-meta d-flex justify-content-between align-items-center mt-auto">
+                                            <div class="d-flex align-items-center">
+                                                <div class="avatar-sm bg-soft-primary text-primary rounded-circle me-2 d-flex align-items-center justify-content-center">
+                                                    {{ course.teacher.first_name|first|upper }}{% if course.teacher.last_name %}{{ course.teacher.last_name|first|upper }}{% else %}{{ course.teacher.username|first|upper }}{% endif %}
+                                                </div>
+                                                <small>{{ course.teacher.get_full_name|default:course.teacher.username }}</small>
+                                            </div>
+                                            <div class="stats">
+                                                <span class="me-2">
+                                                    <i class="fas fa-users text-muted me-1"></i>
+                                                    <span class="purecounter">{{ course.enrolled_students.count }}</span>
+                                                </span>
+                                                <span>
+                                                    <i class="fas fa-book text-muted me-1"></i>
+                                                    <span class="purecounter">{{ course.resources.count }}</span>
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <!-- Aucun cours disponible -->
+            <div class="text-center py-5 my-5">
+                <div class="empty-state">
+                    <div class="empty-state-icon">
+                        <i class="fas fa-book-open-reader"></i>
+                    </div>
+                    <h3 class="mt-4">Aucun cours pour le moment</h3>
+                    <p class="text-muted mb-4">Vous n'êtes inscrit à aucun cours pour le moment.</p>
+                    <a href="{% url 'courses:course_list' %}" class="btn btn-primary">
+                        <i class="fas fa-book me-2"></i>Parcourir les cours disponibles
+                    </a>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

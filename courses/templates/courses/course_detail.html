@@ -1,0 +1,696 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/courses.css' %}">
+<style>
+    .course-header {
+        background: linear-gradient(135deg, #226D68 0%, #1a534f 100%);
+        color: white;
+        border-radius: 0.75rem;
+        padding: 2rem;
+        margin-bottom: 2rem;
+        position: relative;
+        overflow: hidden;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    .course-header::after {
+        content: '';
+        position: absolute;
+        top: -50%;
+        right: -50%;
+        width: 100%;
+        height: 200%;
+        background: rgba(255, 255, 255, 0.1);
+        transform: rotate(30deg);
+        z-index: 1;
+    }
+
+    .course-header h2 {
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+        position: relative;
+        z-index: 2;
+    }
+
+    .course-header p {
+        opacity: 0.9;
+        margin-bottom: 1.5rem;
+        position: relative;
+        z-index: 2;
+        font-size: 1.1rem;
+    }
+
+    .course-header .badge {
+        font-size: 0.85rem;
+        padding: 0.5rem 1rem;
+        border-radius: 2rem;
+        margin-right: 0.5rem;
+        background: rgba(255, 255, 255, 0.2);
+        color: white;
+        backdrop-filter: blur(5px);
+    }
+
+    .course-section {
+        background: white;
+        border-radius: 0.75rem;
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        border: 1px solid rgba(0, 0, 0, 0.05);
+    }
+
+    .course-section h5 {
+        color: #226D68;
+        font-weight: 600;
+        margin-bottom: 1.25rem;
+        padding-bottom: 0.75rem;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    }
+
+    .resource-item {
+        background: #f8f9fa;
+        border-radius: 0.5rem;
+        padding: 1rem;
+        margin-bottom: 1rem;
+        transition: all 0.3s ease;
+        border: 1px solid rgba(0, 0, 0, 0.05);
+    }
+
+    .resource-item:hover {
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        transform: translateY(-2px);
+    }
+
+    .resource-item h6 {
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+        color: #333;
+    }
+
+    .resource-item p {
+        color: #6c757d;
+        font-size: 0.9rem;
+        margin-bottom: 0.75rem;
+    }
+
+    .btn-teal {
+        background-color: #226D68;
+        border-color: #226D68;
+        color: white;
+    }
+
+    .btn-teal:hover {
+        background-color: #1a534f;
+        border-color: #1a534f;
+        color: white;
+    }
+
+    .btn-outline-teal {
+        color: #226D68;
+        border-color: #226D68;
+    }
+
+    .btn-outline-teal:hover {
+        background-color: #226D68;
+        border-color: #226D68;
+        color: white;
+    }
+
+    .accordion-button:not(.collapsed) {
+        background-color: rgba(34, 109, 104, 0.1);
+        color: #226D68;
+    }
+
+    .accordion-button:focus {
+        border-color: #226D68;
+        box-shadow: 0 0 0 0.25rem rgba(34, 109, 104, 0.25);
+    }
+
+    .accordion-item {
+        border-radius: 0.5rem;
+        overflow: hidden;
+        margin-bottom: 0.75rem;
+        border: 1px solid rgba(0, 0, 0, 0.1);
+    }
+
+    .accordion-header {
+        background: white;
+    }
+
+    .accordion-button {
+        padding: 1rem 1.25rem;
+        font-weight: 500;
+    }
+
+    .accordion-body {
+        padding: 1.25rem;
+        background: #f8f9fa;
+    }
+
+    .students-card {
+        border-radius: 0.75rem;
+        overflow: hidden;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+        border: none;
+    }
+
+    .students-card .card-header {
+        background: linear-gradient(135deg, #226D68 0%, #1a534f 100%);
+        color: white;
+        padding: 1rem 1.25rem;
+    }
+
+    .avatar-sm {
+        width: 40px;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 600;
+        font-size: 1rem;
+    }
+
+    .bg-soft-primary {
+        background-color: rgba(34, 109, 104, 0.15);
+    }
+
+    .text-primary {
+        color: #226D68 !important;
+    }
+
+    .empty-state {
+        padding: 2rem;
+        text-align: center;
+    }
+
+    .empty-state i {
+        font-size: 3rem;
+        color: #dee2e6;
+        margin-bottom: 1rem;
+    }
+
+    .empty-state p {
+        color: #6c757d;
+        margin-bottom: 1.5rem;
+    }
+
+    /* Additional styles for student list and statistics */
+    .bg-soft-primary {
+        background-color: rgba(34, 109, 104, 0.1);
+    }
+
+    .bg-soft-success {
+        background-color: rgba(34, 109, 104, 0.15);
+    }
+
+    .bg-soft-info {
+        background-color: rgba(34, 109, 104, 0.2);
+    }
+
+    .text-success {
+        color: #226D68 !important;
+    }
+
+    .text-info {
+        color: #226D68 !important;
+    }
+
+    .rounded-pill {
+        border-radius: 50rem !important;
+    }
+
+    .fw-medium {
+        font-weight: 500 !important;
+    }
+
+    .display-6 {
+        font-size: 1.5rem;
+        font-weight: 600;
+        line-height: 1.2;
+    }
+
+
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <!-- Colonne principale : Détails du cours -->
+        <div class="col-md-8">
+            <div class="course-header">
+                <h2 class="mb-3">{{ course.title }}</h2>
+
+                <div class="d-flex align-items-center mb-3">
+                    <div class="me-4">
+                        <i class="fas fa-users me-1 text-white-50"></i>
+                        <span class="text-white">{{ enrolled_students.count }} étudiants</span>
+                    </div>
+
+                    {% if course.access_key and user.is_superuser or user == course.teacher %}
+                    <div class="me-4">
+                        <i class="fas fa-key me-1 text-white-50"></i>
+                        <span class="text-white">{{ course.access_key }}</span>
+                    </div>
+                    {% endif %}
+
+                    <div>
+                        <i class="fas fa-chart-line me-1 text-white-50"></i>
+                        <span class="text-white">{{ course.get_level_display }}</span>
+                    </div>
+                </div>
+
+                <p class="mb-4">{{ course.description }}</p>
+
+                {% if user.is_superuser or user == course.teacher %}
+                    <div class="d-flex justify-content-end mt-3">
+                        <a href="{% url 'courses:course_update' course.pk %}" class="btn btn-primary me-2">
+                            <i class="fas fa-edit me-1"></i> Modifier
+                        </a>
+                        <a href="{% url 'courses:course_delete' course.pk %}" class="btn btn-danger"
+                           onclick="return confirm('Êtes-vous sûr de vouloir supprimer ce cours ?')">
+                            <i class="fas fa-trash me-1"></i> Supprimer
+                        </a>
+                    </div>
+                {% endif %}
+
+                {% if is_enrolled and user.is_authenticated and user.is_student %}
+                    <div class="mt-3">
+                        <form method="post" action="{% url 'courses:unroll_course' pk=course.pk %}">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-light">
+                                <i class="fas fa-sign-out-alt me-1"></i>Se désinscrire
+                            </button>
+                        </form>
+                    </div>
+                {% endif %}
+            </div>
+
+
+            {% if not is_enrolled and user.is_authenticated and user.is_student %}
+                <div class="course-section">
+                    <h5><i class="fas fa-user-plus me-2"></i>Inscription au cours</h5>
+                    <form method="post" action="{% url 'courses:enroll_course' pk=course.pk %}">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            {{ enroll_form.as_p }}
+                        </div>
+                        <button type="submit" class="btn btn-teal">
+                            <i class="fas fa-check-circle me-2"></i>S'inscrire au cours
+                        </button>
+                    </form>
+                </div>
+            {% endif %}
+
+            <!-- Ressources -->
+            {% if user.is_superuser or user.is_teacher and course.teacher == user or is_enrolled %}
+                <div class="course-section">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0"><i class="fas fa-file-alt me-2"></i>Ressources</h5>
+                        {% if user.is_teacher and course.teacher == user %}
+                            <a href="{% url 'courses:resource_create' course.pk %}" class="btn btn-sm btn-teal">
+                                <i class="fas fa-plus"></i> Ajouter une ressource
+                            </a>
+                        {% endif %}
+                    </div>
+
+                    {% if resources %}
+                        <div class="mt-3">
+                            {% for resource in resources %}
+                                <div class="resource-item">
+                                    <h6>{{ resource.title }}</h6>
+                                    <p>{{ resource.description }}</p>
+
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div class="d-flex">
+                                            <a href="{{ resource.file.url }}" class="btn btn-sm btn-outline-teal me-2">
+                                                <i class="fas fa-download me-1"></i> Télécharger
+                                            </a>
+                                            {% if resource.file.url|slice:"-3:" == "pdf" %}
+                                                <a href="{{ resource.file.url }}" target="_blank" class="btn btn-sm btn-outline-secondary">
+                                                    <i class="fas fa-eye me-1"></i> Visualiser
+                                                </a>
+                                            {% endif %}
+                                        </div>
+
+                                        {% if user.is_teacher and course.teacher == user %}
+                                            <form method="post" action="{% url 'courses:resource_delete' course.pk resource.pk %}">
+                                                {% csrf_token %}
+                                                <button class="btn btn-sm btn-danger" onclick="return confirm('Êtes-vous sûr de vouloir supprimer cette ressource ?')">
+                                                    <i class="fas fa-trash me-1"></i> Supprimer
+                                                </button>
+                                            </form>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="empty-state mt-4">
+                            <i class="fas fa-file-alt"></i>
+                            <p>Aucune ressource disponible pour ce cours.</p>
+                            {% if user.is_teacher and course.teacher == user %}
+                                <a href="{% url 'courses:resource_create' course.pk %}" class="btn btn-outline-teal">
+                                    <i class="fas fa-plus me-2"></i>Ajouter une première ressource
+                                </a>
+                            {% endif %}
+                        </div>
+                    {% endif %}
+                </div>
+            {% endif %}
+
+            <!-- TP/TD -->
+            {% if is_enrolled or user.is_teacher and course.teacher == user or user.is_superuser %}
+                <div class="course-section">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0"><i class="fas fa-tasks me-2"></i>TP/TD</h5>
+                        {% if user.is_teacher and course.teacher == user or user.is_superuser %}
+                            <a href="{% url 'courses:assignment_create' course.pk %}" class="btn btn-sm btn-teal">
+                                <i class="fas fa-plus"></i> Ajouter un TP/TD
+                            </a>
+                        {% endif %}
+                    </div>
+
+                    {% if assignments %}
+                        <div class="accordion mt-3" id="assignmentAccordion">
+                            {% for assignment in assignments %}
+                                <div class="accordion-item">
+                                    <h2 class="accordion-header" id="heading{{ assignment.pk }}">
+                                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse{{ assignment.pk }}" aria-expanded="false" aria-controls="collapse{{ assignment.pk }}">
+                                            <div class="d-flex align-items-center w-100">
+                                                <div class="me-auto">
+                                                    {{ assignment.title }}
+                                                </div>
+                                                <div class="ms-3 d-flex align-items-center">
+                                                    <span class="badge bg-secondary me-2">{{ assignment.get_assignment_type_display }}</span>
+                                                    {% if assignment.due_date < now %}
+                                                        <span class="badge bg-danger">Terminé</span>
+                                                    {% elif assignment.is_submitted %}
+                                                        <span class="badge bg-success">Soumis</span>
+                                                    {% else %}
+                                                        <span class="badge bg-warning text-dark">En cours</span>
+                                                    {% endif %}
+                                                </div>
+                                            </div>
+                                        </button>
+                                    </h2>
+                                    <div id="collapse{{ assignment.pk }}" class="accordion-collapse collapse" aria-labelledby="heading{{ assignment.pk }}" data-bs-parent="#assignmentAccordion">
+                                        <div class="accordion-body">
+                                            <div class="mb-3">
+                                                <h6 class="fw-bold">Description</h6>
+                                                <p>{{ assignment.description }}</p>
+                                            </div>
+
+                                            <div class="mb-3">
+                                                <h6 class="fw-bold">Informations</h6>
+                                                <div class="d-flex flex-wrap">
+                                                    <div class="me-4 mb-2">
+                                                        <i class="far fa-calendar-alt me-1 text-muted"></i>
+                                                        <strong>Date limite:</strong> {{ assignment.due_date|date:"d/m/Y à H:i" }}
+                                                    </div>
+                                                    <div class="me-4 mb-2">
+                                                        <i class="fas fa-hourglass-half me-1 text-muted"></i>
+                                                        <strong>Temps restant:</strong>
+                                                        {% if assignment.due_date < now %}
+                                                            <span class="text-danger">Expiré</span>
+                                                        {% else %}
+                                                            {{ assignment.due_date|timeuntil }}
+                                                        {% endif %}
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="mb-3">
+                                                <h6 class="fw-bold">Fichier</h6>
+                                                {% if assignment.file %}
+                                                    <div class="d-flex">
+                                                        <a href="{{ assignment.file.url }}" class="btn btn-sm btn-outline-teal me-2">
+                                                            <i class="fas fa-download me-1"></i> Télécharger
+                                                        </a>
+                                                        {% if assignment.file.url|slice:"-3:" == "pdf" %}
+                                                            <a href="{{ assignment.file.url }}" target="_blank" class="btn btn-sm btn-outline-secondary">
+                                                                <i class="fas fa-eye me-1"></i> Visualiser
+                                                            </a>
+                                                        {% endif %}
+                                                    </div>
+                                                {% else %}
+                                                    <p class="text-muted">Aucun fichier disponible pour ce TP/TD.</p>
+                                                {% endif %}
+                                            </div>
+
+                                            <div class="mt-4 pt-3 border-top">
+                                                {% if user.is_teacher and course.teacher == user or user.is_superuser %}
+                                                    <div class="d-flex">
+                                                        <a href="{% url 'courses:submission_list' course.pk assignment.pk %}" class="btn btn-primary btn-sm me-2">
+                                                            <i class="fas fa-list me-1"></i> Voir les soumissions
+                                                        </a>
+                                                        <form method="post" action="{% url 'courses:assignment_delete' course.pk assignment.pk %}">
+                                                            {% csrf_token %}
+                                                            <button class="btn btn-danger btn-sm" onclick="return confirm('Êtes-vous sûr de vouloir supprimer ce TP/TD ?')">
+                                                                <i class="fas fa-trash me-1"></i> Supprimer
+                                                            </button>
+                                                        </form>
+                                                    </div>
+                                                {% elif user.is_student and is_enrolled %}
+                                                    <div>
+                                                        {% if assignment.due_date < now %}
+                                                            <div class="alert alert-danger">
+                                                                <i class="fas fa-exclamation-circle me-2"></i>
+                                                                La date limite pour soumettre ce TP/TD est déjà passée.
+                                                            </div>
+                                                        {% elif assignment.is_submitted %}
+                                                            {% for submission in assignment.submissions.all %}
+                                                                {% if submission.student == user %}
+                                                                    {% if submission.status == 'validated' %}
+                                                                        <div class="alert alert-success">
+                                                                            <div class="d-flex justify-content-between align-items-start">
+                                                                                <div>
+                                                                                    <i class="fas fa-check-circle me-2"></i>
+                                                                                    Votre soumission a été validée.
+                                                                                    {% if submission.grade %}
+                                                                                        <strong class="ms-2">Note: {{ submission.grade }}/20</strong>
+                                                                                    {% endif %}
+
+                                                                                    {% if submission.feedback %}
+                                                                                        <p class="mb-0 mt-1 small"><strong>Commentaire:</strong> {{ submission.feedback }}</p>
+                                                                                    {% endif %}
+                                                                                </div>
+                                                                                {% if submission.validated_at %}
+                                                                                    <span class="badge bg-light text-success">
+                                                                                        <i class="far fa-calendar-check me-1"></i>
+                                                                                        {{ submission.validated_at|date:"d/m/Y" }}
+                                                                                    </span>
+                                                                                {% endif %}
+                                                                            </div>
+                                                                        </div>
+                                                                    {% elif submission.status == 'rejected' %}
+                                                                        <div class="alert alert-danger">
+                                                                            <div class="d-flex justify-content-between align-items-start">
+                                                                                <div>
+                                                                                    <i class="fas fa-times-circle me-2"></i>
+                                                                                    Votre soumission a été rejetée.
+                                                                                    {% if submission.grade %}
+                                                                                        <strong class="ms-2">Note: {{ submission.grade }}/20</strong>
+                                                                                        <span class="text-muted small ms-2">(minimum requis: 10/20)</span>
+                                                                                    {% endif %}
+
+                                                                                    {% if submission.feedback %}
+                                                                                        <p class="mb-0 mt-1 small"><strong>Commentaire:</strong> {{ submission.feedback }}</p>
+                                                                                    {% endif %}
+                                                                                </div>
+                                                                                {% if submission.validated_at %}
+                                                                                    <span class="badge bg-light text-danger">
+                                                                                        <i class="far fa-calendar-times me-1"></i>
+                                                                                        {{ submission.validated_at|date:"d/m/Y" }}
+                                                                                    </span>
+                                                                                {% endif %}
+                                                                            </div>
+                                                                            <div class="mt-2">
+                                                                                <a href="{% url 'courses:submission_create' course.pk assignment.pk %}" class="btn btn-sm btn-outline-danger">
+                                                                                    <i class="fas fa-redo me-1"></i> Soumettre à nouveau
+                                                                                </a>
+                                                                            </div>
+                                                                        </div>
+                                                                    {% else %}
+                                                                        <div class="alert alert-warning">
+                                                                            <i class="fas fa-clock me-2"></i>
+                                                                            Votre soumission est en attente de vérification.
+                                                                            <div class="mt-1 small text-muted">
+                                                                                <i class="fas fa-info-circle me-1"></i>
+                                                                                Les soumissions sont validées automatiquement si la note est supérieure ou égale à 10/20.
+                                                                            </div>
+                                                                        </div>
+                                                                    {% endif %}
+                                                                {% endif %}
+                                                            {% endfor %}
+                                                        {% else %}
+                                                            <a href="{% url 'courses:submission_create' course.pk assignment.pk %}" class="btn btn-teal">
+                                                                <i class="fas fa-upload me-2"></i> Soumettre mon travail
+                                                            </a>
+                                                        {% endif %}
+                                                    </div>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="empty-state mt-4">
+                            <i class="fas fa-tasks"></i>
+                            <p>Aucun TP/TD disponible pour ce cours.</p>
+                            {% if user.is_teacher and course.teacher == user %}
+                                <a href="{% url 'courses:assignment_create' course.pk %}" class="btn btn-outline-teal">
+                                    <i class="fas fa-plus me-2"></i>Ajouter un premier TP/TD
+                                </a>
+                            {% endif %}
+                        </div>
+                    {% endif %}
+                </div>
+            {% endif %}
+        </div>
+
+        <!-- Colonne droite : Liste des étudiants (seulement pour admin/enseignant) -->
+        {% if can_view_students %}
+        <div class="col-md-4">
+            <div class="students-card mb-4">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <div>
+                        <h5 class="mb-0">
+                            <i class="fas fa-users me-2"></i>Étudiants inscrits
+                        </h5>
+                        <p class="text-white-50 mb-0 small">
+                            <i class="fas fa-info-circle me-1"></i>
+                            {{ enrolled_students.count }} étudiant{% if enrolled_students.count != 1 %}s{% endif %} dans ce cours
+                        </p>
+                    </div>
+                    {% if user == course.teacher or user.is_superuser %}
+                        <a href="{% url 'courses:course_students_list' course.pk %}" class="btn btn-sm btn-light" title="Gérer les étudiants">
+                            <i class="fas fa-user-cog me-1"></i> Gérer
+                        </a>
+                    {% endif %}
+                </div>
+                <div class="card-body p-0">
+                    {% if enrolled_students %}
+                        <div class="list-group list-group-flush">
+                            {% for student in enrolled_students|slice:":5" %}
+                                <div class="list-group-item">
+                                    <div class="d-flex align-items-center">
+                                        <div class="avatar-sm bg-soft-primary text-primary rounded-circle me-3 d-flex align-items-center justify-content-center">
+                                            {{ student.first_name|first|upper }}{% if student.last_name %}{{ student.last_name|first|upper }}{% else %}{{ student.username|first|upper }}{% endif %}
+                                        </div>
+                                        <div class="flex-grow-1">
+                                            <div class="d-flex justify-content-between align-items-center">
+                                                <h6 class="mb-0">
+                                                    {% if student.get_full_name %}
+                                                        {{ student.get_full_name }}
+                                                    {% else %}
+                                                        {{ student.username }}
+                                                    {% endif %}
+                                                </h6>
+                                                <span class="badge bg-soft-primary text-primary rounded-pill px-2 py-1 small">
+                                                    <i class="fas fa-graduation-cap me-1"></i>Étudiant
+                                                </span>
+                                            </div>
+                                            <div class="d-flex align-items-center mt-1">
+                                                <small class="text-muted me-3">
+                                                    <i class="fas fa-envelope me-1"></i>
+                                                    {% if student.email %}
+                                                        {{ student.email }}
+                                                    {% else %}
+                                                        Non renseigné
+                                                    {% endif %}
+                                                </small>
+                                                {% if user == course.teacher or user.is_superuser %}
+                                                <small>
+                                                    <a href="mailto:{{ student.email }}" class="text-primary">
+                                                        <i class="fas fa-paper-plane"></i>
+                                                    </a>
+                                                </small>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endfor %}
+
+                            {% if enrolled_students.count > 5 %}
+                                <div class="text-center py-3 border-top">
+                                    <a href="{% url 'courses:course_students_list' course.pk %}" class="btn btn-sm btn-outline-primary">
+                                        <i class="fas fa-users me-1"></i> Voir tous les étudiants ({{ enrolled_students.count }})
+                                    </a>
+                                </div>
+                            {% endif %}
+                        </div>
+                    {% else %}
+                        <div class="empty-state">
+                            <i class="fas fa-users-slash"></i>
+                            <h6 class="mt-3 mb-2">Aucun étudiant inscrit</h6>
+                            <p class="text-muted mb-3">Ce cours n'a pas encore d'étudiants inscrits.</p>
+                            {% if user == course.teacher or user.is_superuser %}
+                                <a href="{% url 'courses:course_students_list' course.pk %}" class="btn btn-outline-teal">
+                                    <i class="fas fa-user-plus me-1"></i> Gérer les inscriptions
+                                </a>
+                            {% endif %}
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Statistiques du cours -->
+            <div class="students-card">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="fas fa-chart-pie me-2"></i>Statistiques du cours
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <div class="p-3 bg-soft-primary rounded text-center">
+                                <div class="display-6 text-primary mb-1">{{ resources|length }}</div>
+                                <div class="d-flex align-items-center justify-content-center">
+                                    <i class="fas fa-book me-2 text-primary"></i>
+                                    <span class="fw-medium">Ressources</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="p-3 bg-soft-success rounded text-center">
+                                <div class="display-6 text-success mb-1">{{ assignments|length }}</div>
+                                <div class="d-flex align-items-center justify-content-center">
+                                    <i class="fas fa-clipboard-list me-2 text-success"></i>
+                                    <span class="fw-medium">TP/TD</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="p-3 bg-soft-info rounded text-center">
+                                <div class="display-6 text-info mb-1">{{ enrolled_students.count }}</div>
+                                <div class="d-flex align-items-center justify-content-center">
+                                    <i class="fas fa-users me-2 text-info"></i>
+                                    <span class="fw-medium">Étudiants</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {% if user == course.teacher or user.is_superuser %}
+                    <div class="mt-4 pt-3 border-top">
+                        <div class="d-grid">
+                            <a href="{% url 'courses:course_update' course.pk %}" class="btn btn-outline-teal btn-sm">
+                                <i class="fas fa-cog me-2"></i>Gérer le cours
+                            </a>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

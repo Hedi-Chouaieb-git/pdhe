@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Bienvenue sur la plateforme E-learning</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .header {
+            background-color: #226D68;
+            color: white;
+            padding: 20px;
+            text-align: center;
+            border-radius: 5px 5px 0 0;
+        }
+        .content {
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-top: none;
+            border-radius: 0 0 5px 5px;
+        }
+        .footer {
+            margin-top: 20px;
+            text-align: center;
+            font-size: 12px;
+            color: #777;
+        }
+        .btn {
+            display: inline-block;
+            background-color: #226D68;
+            color: white;
+            text-decoration: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            margin-top: 15px;
+        }
+        .credentials {
+            background-color: #f9f9f9;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 15px 0;
+            border-left: 4px solid #226D68;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Bienvenue sur {{ site_name }}</h1>
+    </div>
+    <div class="content">
+        <p>Bonjour {% if user.first_name %}{{ user.first_name }}{% else %}{{ user.username }}{% endif %},</p>
+
+        <p>Nous sommes ravis de vous accueillir en tant qu'enseignant sur notre plateforme d'apprentissage en ligne.</p>
+
+        <p>Votre compte a été créé avec succès. Voici vos informations de connexion :</p>
+
+        <div class="credentials">
+            <p><strong>Email :</strong> {{ user.email }}</p>
+            <p><strong>Nom d'utilisateur :</strong> {{ user.username }}</p>
+            <p><strong>Mot de passe :</strong> {{ password }}</p>
+        </div>
+
+        <p>Pour des raisons de sécurité, nous vous recommandons de changer votre mot de passe dès votre première connexion.</p>
+
+        <p>Vous pouvez vous connecter en cliquant sur le bouton ci-dessous :</p>
+
+        <div style="text-align: center;">
+            <a href="{{ login_url }}" class="btn">Se connecter</a>
+        </div>
+
+        <p>Si vous avez des questions ou besoin d'aide, n'hésitez pas à contacter notre équipe de support.</p>
+
+        <p>Cordialement,<br>
+        L'équipe {{ site_name }}</p>
+    </div>
+    <div class="footer">
+        <p>Si vous avez des questions, vous pouvez contacter l'administrateur à l'adresse : <a href="mailto:{{ admin_email }}">{{ admin_email }}</a></p>
+        <p>Cet email a été envoyé automatiquement depuis la plateforme E-learning.</p>
+        <p>&copy; {{ site_name }} {% now "Y" %}</p>
+    </div>
+</body>
+</html>

@@ -1,0 +1,411 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block extra_css %}
+<style>
+    .courses-container {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 20px;
+        padding: 10px 0;
+    }
+
+    .course-item {
+        flex: 0 0 calc(25% - 15px);
+        min-width: 220px;
+        transition: all 0.3s ease;
+    }
+
+    .course-card {
+        border: 1px solid #e0e0e0;
+        border-radius: 12px;
+        overflow: hidden;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .course-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 15px rgba(0,0,0,0.1);
+    }
+
+    .course-header {
+        position: relative;
+        height: 0;
+        padding-bottom: 30%;
+        background: linear-gradient(135deg, #226D68 0%, #1a534f 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+    }
+
+    .course-icon {
+        font-size: 1.5rem;
+        opacity: 0.8;
+    }
+
+    .btn-view {
+        position: absolute;
+        bottom: -15px;
+        right: 15px;
+        background: white;
+        color: #226D68;
+        border-radius: 20px;
+        padding: 3px 12px;
+        font-size: 0.7rem;
+        font-weight: 500;
+        border: none;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+
+    .card-content {
+        padding: 0.75rem;
+        flex-grow: 1;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .card-title {
+        color: #2c3e50;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+        font-size: 0.9rem;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .card-text {
+        color: #6c757d;
+        font-size: 0.75rem;
+        margin: 0.5rem 0;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        line-height: 1.3;
+    }
+
+    .badge-level {
+        background: #e8f5e9;
+        color: #2e7d32;
+        padding: 3px 10px;
+        border-radius: 15px;
+        font-size: 0.7rem;
+        font-weight: 500;
+        margin-bottom: 0.5rem;
+        display: inline-block;
+    }
+
+    .badge-new {
+        background: #ffebee;
+        color: #c62828;
+        padding: 3px 10px;
+        border-radius: 15px;
+        font-size: 0.7rem;
+        font-weight: 500;
+    }
+
+    .course-meta {
+        display: flex;
+        align-items: center;
+        margin-top: 0.5rem;
+        padding-top: 0.5rem;
+        border-top: 1px solid #f0f0f0;
+    }
+
+    .teacher-avatar {
+        width: 26px;
+        height: 26px;
+        border-radius: 50%;
+        margin-right: 8px;
+        object-fit: cover;
+    }
+
+    .course-stats {
+        display: flex;
+        justify-content: space-between;
+        color: #6c757d;
+        font-size: 0.7rem;
+        padding: 0.4rem 0.75rem;
+        border-top: 1px solid #f0f0f0;
+        background: #f9f9f9;
+    }
+
+    .course-stats span {
+        display: flex;
+        align-items: center;
+    }
+
+    .course-stats i {
+        margin-right: 5px;
+        color: #95a5a6;
+    }
+
+    .course-actions {
+        display: flex;
+        gap: 5px;
+    }
+
+    .course-actions .btn {
+        padding: 0.25rem 0.5rem;
+        font-size: 0.75rem;
+    }
+
+    @media (max-width: 992px) {
+        .course-item {
+            flex: 0 0 calc(33.333% - 14px);
+        }
+    }
+
+    @media (max-width: 768px) {
+        .course-item {
+            flex: 0 0 calc(50% - 10px);
+        }
+    }
+
+    @media (max-width: 480px) {
+        .course-item {
+            flex: 0 0 100%;
+        }
+    }
+
+    /* Styles pour les filtres */
+    .card.shadow-sm {
+        border-radius: 0.75rem;
+        overflow: hidden;
+        transition: all 0.3s ease;
+        border: none;
+    }
+
+    .card.shadow-sm:hover {
+        box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1) !important;
+    }
+
+    .form-select {
+        border-radius: 0.5rem;
+        padding: 0.5rem 1rem;
+        border-color: #dee2e6;
+        background-position: right 0.75rem center;
+        transition: all 0.3s ease;
+    }
+
+    .form-select:focus {
+        border-color: #226D68;
+        box-shadow: 0 0 0 0.25rem rgba(34, 109, 104, 0.25);
+    }
+
+    .input-group .input-group-text {
+        border-radius: 0.5rem 0 0 0.5rem;
+    }
+
+    .input-group .form-control {
+        border-radius: 0 0.5rem 0.5rem 0;
+    }
+
+    .alert-info {
+        background-color: rgba(34, 109, 104, 0.1);
+        border-color: rgba(34, 109, 104, 0.2);
+        color: #226D68;
+    }
+
+    .btn-outline-info {
+        color: #226D68;
+        border-color: #226D68;
+    }
+
+    .btn-outline-info:hover {
+        background-color: #226D68;
+        border-color: #226D68;
+        color: white;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="mb-0">Tous les cours</h2>
+            <p class="text-muted mb-0">Découvrez tous les cours disponibles sur la plateforme</p>
+        </div>
+        <div>
+            {% if user.is_authenticated and user.is_teacher or user.is_superuser %}
+            <a href="{% url 'courses:course_create' %}" class="btn btn-primary">
+                <i class="fas fa-plus me-2"></i>Créer un cours
+            </a>
+            {% elif user.is_authenticated and user.is_student %}
+            <a href="{% url 'courses:student_courses' %}" class="btn btn-outline-teal">
+                <i class="fas fa-bookmark me-2"></i>Voir mes cours
+            </a>
+            {% endif %}
+        </div>
+    </div>
+
+
+
+    <!-- Filtres et recherche -->
+    <div class="card mb-4 shadow-sm">
+        <div class="card-body">
+            <form method="get" action="{% url 'courses:course_list' %}" class="row g-3">
+                <!-- Recherche -->
+                <div class="col-md-6">
+                    <div class="input-group">
+                        <span class="input-group-text bg-white border-end-0">
+                            <i class="fas fa-search text-muted"></i>
+                        </span>
+                        <input
+                            type="text"
+                            name="q"
+                            class="form-control border-start-0 ps-0"
+                            placeholder="Rechercher un cours..."
+                            value="{{ request.GET.q }}"
+                        >
+                    </div>
+                </div>
+
+                <!-- Filtre par niveau -->
+                <div class="col-md-3">
+                    <select name="level" class="form-select" id="levelFilter">
+                        <option value="">Tous les niveaux</option>
+                        {% for level_code, level_name in level_choices %}
+                        <option value="{{ level_code }}" {% if request.GET.level == level_code %}selected{% endif %}>
+                            {{ level_name }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <!-- Boutons -->
+                <div class="col-md-3">
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-primary flex-grow-1">
+                            <i class="fas fa-filter me-1"></i> Filtrer
+                        </button>
+                        {% if request.GET.q or request.GET.level %}
+                        <a href="{% url 'courses:course_list' %}" class="btn btn-outline-secondary">
+                            <i class="fas fa-times"></i>
+                        </a>
+                        {% endif %}
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Indicateur de filtre actif -->
+    {% if request.GET.q or request.GET.level %}
+    <div class="alert alert-info mb-4">
+        <div class="d-flex justify-content-between align-items-center">
+            <div>
+                <i class="fas fa-info-circle me-2"></i>
+                {% if courses|length == 0 %}
+                    Aucun cours trouvé
+                {% else %}
+                    {{ courses|length }} cours trouvé{{ courses|length|pluralize }}
+                {% endif %}
+
+                {% if request.GET.q %}
+                    pour la recherche "<strong>{{ request.GET.q }}</strong>"
+                {% endif %}
+
+                {% if request.GET.level %}
+                    {% for level_code, level_name in level_choices %}
+                        {% if request.GET.level == level_code %}
+                            dans le niveau "<strong>{{ level_name }}</strong>"
+                        {% endif %}
+                    {% endfor %}
+                {% endif %}
+            </div>
+            <a href="{% url 'courses:course_list' %}" class="btn btn-sm btn-outline-info">
+                <i class="fas fa-times me-1"></i> Réinitialiser les filtres
+            </a>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Liste des cours -->
+    {% if courses %}
+    <div class="courses-container">
+        {% for course in courses %}
+        <div class="course-item">
+            <div class="course-card">
+                <a href="{% url 'courses:course_detail' course.pk %}" class="text-decoration-none text-body d-block h-100">
+                    <div class="course-header">
+                        <div class="course-icon">
+                            <i class="fas fa-book-open"></i>
+                        </div>
+                        <span class="btn-view">
+                            <i class="fas fa-eye me-1"></i> Voir le cours
+                        </span>
+                    </div>
+
+                    <div class="card-content">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <span class="badge-level">
+                                <i class="fas fa-chart-line me-1"></i>{{ course.get_level_display }}
+                            </span>
+                            {% if course.is_new %}
+                            <span class="badge-new">Nouveau</span>
+                            {% endif %}
+                        </div>
+
+                        <h5 class="card-title">{{ course.title }}</h5>
+                        <p class="card-text">{{ course.description|truncatewords:25 }}</p>
+
+                        <div class="course-meta">
+                            {% if course.teacher.profile_picture %}
+                            <img src="{{ course.teacher.profile_picture.url }}" alt="{{ course.teacher.get_full_name }}" class="teacher-avatar">
+                            {% else %}
+                            <div class="teacher-avatar bg-light d-flex align-items-center justify-content-center">
+                                <i class="fas fa-user text-muted"></i>
+                            </div>
+                            {% endif %}
+                            <div>
+                                <div class="fw-medium">{{ course.teacher.get_full_name|default:course.teacher.username }}</div>
+                                <small class="text-muted">Enseignant</small>
+                            </div>
+                        </div>
+                    </div>
+                </a>
+
+                <div class="course-stats d-flex justify-content-between align-items-center">
+                    <div>
+                        <span><i class="fas fa-users"></i> {{ course.enrollments.count|default:0 }}</span>
+                        {% if course.duration %}
+                        <span><i class="far fa-clock"></i> {{ course.duration }}h</span>
+                        {% endif %}
+                        {% if course.start_date %}
+                        <span><i class="far fa-calendar"></i> {{ course.start_date|date:"d/m/y" }}</span>
+                        {% endif %}
+                    </div>
+
+                    {% if user.is_superuser or user == course.teacher %}
+                    <div class="course-actions">
+                        <a href="{% url 'courses:course_update' course.pk %}" class="btn btn-sm btn-outline-primary" title="Modifier">
+                            <i class="fas fa-edit"></i>
+                        </a>
+                        <a href="{% url 'courses:course_delete' course.pk %}" class="btn btn-sm btn-outline-danger" title="Supprimer">
+                            <i class="fas fa-trash"></i>
+                        </a>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+
+
+    {% else %}
+    <div class="alert alert-info mt-4">
+        Aucun cours disponible pour le moment.
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

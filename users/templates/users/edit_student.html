@@ -1,0 +1,245 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container">
+    <!-- En-tête de la page -->
+    <div class="row mb-5">
+        <div class="col-12">
+            <div class="page-header d-flex justify-content-between align-items-center">
+                <h1 class="display-5 fw-bold text-primary">
+                    <i class="fas fa-user-edit me-2"></i>Modifier l'étudiant
+                </h1>
+                <a href="{% url 'users:student_list' %}" class="btn btn-outline-secondary">
+                    <i class="fas fa-arrow-left me-2"></i>Retour à la liste
+                </a>
+            </div>
+            <hr class="my-4">
+        </div>
+    </div>
+
+
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow-sm border-0">
+                <div class="card-body p-4">
+                    <div class="text-center mb-4">
+                        <div class="position-relative d-inline-block">
+                            {% if student.profile_picture %}
+                                <img src="{{ student.profile_picture.url }}" class="rounded-circle img-thumbnail" width="120" height="120" alt="Photo de profil">
+                            {% else %}
+                                <div class="avatar-circle-lg bg-soft-primary text-primary d-flex align-items-center justify-content-center">
+                                    <span class="display-4">{{ student.username|first|upper }}</span>
+                                </div>
+                            {% endif %}
+                            <label for="id_profile_picture" class="btn btn-sm btn-primary rounded-circle position-absolute" style="bottom: 10px; right: 10px;" title="Changer la photo">
+                                <i class="fas fa-camera"></i>
+                            </label>
+                        </div>
+                        <h4 class="mt-3 mb-0">{{ student.get_full_name|default:student.username }}</h4>
+                        <p class="text-muted">@{{ student.username }}</p>
+                    </div>
+
+                    <form method="POST" enctype="multipart/form-data" class="needs-validation" novalidate>
+                        {% csrf_token %}
+                        
+                        <!-- Champ de téléchargement de photo caché -->
+                        <input type="file" id="id_profile_picture" name="profile_picture" class="d-none" accept="image/*">
+                        
+                        <div class="row g-3">
+                            <!-- Informations de base -->
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="id_username" class="form-label">Nom d'utilisateur *</label>
+                                    <input type="text" class="form-control" id="id_username" name="username" value="{{ form.username.value|default:'' }}" required>
+                                    <div class="invalid-feedback">
+                                        Veuillez fournir un nom d'utilisateur.
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="id_email" class="form-label">Adresse email *</label>
+                                    <input type="email" class="form-control" id="id_email" name="email" value="{{ form.email.value|default:'' }}" required>
+                                    <div class="invalid-feedback">
+                                        Veuillez fournir une adresse email valide.
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="id_first_name" class="form-label">Prénom</label>
+                                    <input type="text" class="form-control" id="id_first_name" name="first_name" value="{{ form.first_name.value|default:'' }}">
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="id_last_name" class="form-label">Nom</label>
+                                    <input type="text" class="form-control" id="id_last_name" name="last_name" value="{{ form.last_name.value|default:'' }}">
+                                </div>
+                            </div>
+                            
+                            <div class="col-12">
+                                <div class="form-group">
+                                    <label for="id_bio" class="form-label">Biographie</label>
+                                    <textarea class="form-control" id="id_bio" name="bio" rows="3">{{ form.bio.value|default:'' }}</textarea>
+                                </div>
+                            </div>
+                            
+                         
+                            <div class="col-12 mt-4">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <button type="submit" class="btn btn-primary px-4">
+                                        <i class="fas fa-save me-2"></i>Enregistrer les modifications
+                                    </button>
+                                    <a href="{% url 'users:student_list' %}" class="btn btn-outline-secondary">
+                                        <i class="fas fa-times me-2"></i>Annuler
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Styles spécifiques à la page -->
+<style>
+    .page-header {
+        padding: 1.5rem 0;
+        margin-bottom: 2rem;
+        border-bottom: 1px solid rgba(0,0,0,.05);
+    }
+    
+    .avatar-circle-lg {
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto;
+        font-weight: 600;
+    }
+    
+    .form-label {
+        font-weight: 500;
+        margin-bottom: 0.5rem;
+    }
+    
+    .form-control:focus, .form-select:focus {
+        border-color: #226D68;
+        box-shadow: 0 0 0 0.25rem rgba(34, 109, 104, 0.25);
+    }
+    
+    .btn-primary {
+        background-color: #226D68;
+        border-color: #226D68;
+    }
+    
+    .btn-primary:hover, .btn-primary:focus {
+        background-color: #1a5651;
+        border-color: #1a5651;
+    }
+    
+    .btn-outline-primary {
+        color: #226D68;
+        border-color: #226D68;
+    }
+    
+    .btn-outline-primary:hover {
+        background-color: #226D68;
+        border-color: #226D68;
+    }
+    
+    .bg-soft-primary {
+        background-color: rgba(34, 109, 104, 0.1) !important;
+    }
+    
+    .text-primary {
+        color: #226D68 !important;
+    }
+    
+    /* Style pour le bouton de bascule du mot de passe */
+    .toggle-password {
+        border-top-left-radius: 0;
+        border-bottom-left-radius: 0;
+    }
+    
+    /* Style pour les champs obligatoires */
+    .required-field::after {
+        content: " *";
+        color: #dc3545;
+    }
+</style>
+
+<!-- Scripts -->
+<script>
+    // Activer la validation des formulaires Bootstrap
+    (function () {
+        'use strict'
+        
+        // Récupérer tous les formulaires auxquels nous voulons appliquer des styles de validation Bootstrap personnalisés
+        var forms = document.querySelectorAll('.needs-validation')
+        
+        // Boucle sur les champs et empêche la soumission
+        Array.prototype.slice.call(forms).forEach(function (form) {
+            form.addEventListener('submit', function (event) {
+                if (!form.checkValidity()) {
+                    event.preventDefault()
+                    event.stopPropagation()
+                }
+                
+                form.classList.add('was-validated')
+            }, false)
+        })
+        
+        // Basculer la visibilité du mot de passe
+        document.querySelectorAll('.toggle-password').forEach(function(button) {
+            button.addEventListener('click', function() {
+                const targetId = this.getAttribute('data-target');
+                const targetInput = document.getElementById(targetId);
+                const icon = this.querySelector('i');
+                
+                if (targetInput.type === 'password') {
+                    targetInput.type = 'text';
+                    icon.classList.remove('fa-eye');
+                    icon.classList.add('fa-eye-slash');
+                } else {
+                    targetInput.type = 'password';
+                    icon.classList.remove('fa-eye-slash');
+                    icon.classList.add('fa-eye');
+                }
+            });
+        });
+        
+        // Gérer le changement d'image de profil
+        document.getElementById('id_profile_picture').addEventListener('change', function(e) {
+            if (this.files && this.files[0]) {
+                const reader = new FileReader();
+                const preview = document.querySelector('.rounded-circle');
+                
+                reader.onload = function(e) {
+                    preview.src = e.target.result;
+                    // Si c'est un élément div (avatar par défaut), le remplacer par une image
+                    if (preview.tagName === 'DIV') {
+                        const img = document.createElement('img');
+                        img.src = e.target.result;
+                        img.className = 'rounded-circle img-thumbnail';
+                        img.width = 120;
+                        img.height = 120;
+                        img.alt = 'Photo de profil';
+                        preview.parentNode.replaceChild(img, preview);
+                    }
+                }
+                
+                reader.readAsDataURL(this.files[0]);
+            }
+        });
+    })()
+</script>
+{% endblock %}

@@ -1,0 +1,181 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}
+    {% if object %}Modifier le cours{% else %}Créer un cours{% endif %}
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .form-card {
+        border: none;
+        border-radius: 1rem;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+        overflow: hidden;
+        transition: all 0.3s ease;
+    }
+
+    .form-card:hover {
+        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.12);
+        transform: translateY(-5px);
+    }
+
+    .form-header {
+        background: linear-gradient(135deg, #226D68 0%, #1a534f 100%);
+        color: white;
+        padding: 1.5rem;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .form-header h3 {
+        font-weight: 700;
+        position: relative;
+        z-index: 2;
+    }
+
+    .form-header::after {
+        content: '';
+        position: absolute;
+        top: -50%;
+        right: -50%;
+        width: 100%;
+        height: 200%;
+        background: rgba(255, 255, 255, 0.1);
+        transform: rotate(30deg);
+        z-index: 1;
+    }
+
+    .form-icon {
+        position: absolute;
+        top: 50%;
+        right: 2rem;
+        transform: translateY(-50%);
+        font-size: 3rem;
+        opacity: 0.2;
+        z-index: 1;
+    }
+
+    .form-body {
+        padding: 2rem;
+    }
+
+    .section-title {
+        color: #226D68;
+        font-weight: 600;
+        margin-bottom: 1.5rem;
+        padding-bottom: 0.75rem;
+        border-bottom: 1px solid rgba(34, 109, 104, 0.2);
+        position: relative;
+    }
+
+    .section-title::after {
+        content: '';
+        position: absolute;
+        bottom: -1px;
+        left: 0;
+        width: 80px;
+        height: 3px;
+        background: linear-gradient(90deg, #226D68 0%, rgba(34, 109, 104, 0.3) 100%);
+        border-radius: 3px;
+    }
+
+    .form-group label {
+        font-weight: 500;
+        color: #495057;
+    }
+
+    .form-control:focus {
+        border-color: rgba(34, 109, 104, 0.5);
+        box-shadow: 0 0 0 0.25rem rgba(34, 109, 104, 0.15);
+    }
+
+    .btn-primary {
+        background-color: #226D68;
+        border-color: #226D68;
+        padding: 0.5rem 1.5rem;
+        font-weight: 500;
+        transition: all 0.3s ease;
+    }
+
+    .btn-primary:hover {
+        background-color: #1a534f;
+        border-color: #1a534f;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(34, 109, 104, 0.3);
+    }
+
+    .btn-outline-secondary {
+        color: #6c757d;
+        border-color: #6c757d;
+        padding: 0.5rem 1.5rem;
+        font-weight: 500;
+        transition: all 0.3s ease;
+    }
+
+    .btn-outline-secondary:hover {
+        background-color: #6c757d;
+        color: white;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(108, 117, 125, 0.3);
+    }
+
+    .form-actions {
+        margin-top: 2rem;
+        padding-top: 1.5rem;
+        border-top: 1px solid rgba(0, 0, 0, 0.05);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card form-card">
+                <div class="form-header">
+                    <h3 class="mb-0">
+                        {% if object %}Modifier le cours{% else %}Créer un cours{% endif %}
+                    </h3>
+                    <div class="form-icon">
+                        <i class="fas fa-book-open"></i>
+                    </div>
+                </div>
+                <div class="card-body form-body">
+                    <form method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        <div class="mb-4">
+                            <h5 class="section-title">
+                                <i class="fas fa-info-circle me-2"></i>Informations du cours
+                            </h5>
+                            <div class="row">
+                                <div class="col-md-12">
+                                    {{ form.title|as_crispy_field }}
+                                </div>
+                                <div class="col-md-12">
+                                    {{ form.description|as_crispy_field }}
+                                </div>
+                                <div class="col-md-6">
+                                    {{ form.level|as_crispy_field }}
+                                </div>
+                                <div class="col-md-6">
+                                    {{ form.access_key|as_crispy_field }}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-actions d-grid gap-2 d-md-flex justify-content-md-end">
+                            <a href="{% url 'courses:course_list' %}" class="btn btn-outline-secondary me-md-2">
+                                <i class="fas fa-times me-1"></i> Annuler
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save me-1"></i> {% if object %}Mettre à jour{% else %}Créer{% endif %}
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

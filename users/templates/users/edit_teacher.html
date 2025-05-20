@@ -1,0 +1,347 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container">
+    <!-- En-tête de la page -->
+    <div class="row mb-5">
+        <div class="col-12">
+            <div class="page-header d-flex justify-content-between align-items-center">
+                <h1 class="display-5 fw-bold text-dark">
+                    <i class="fas fa-chalkboard-teacher me-2"></i>Modifier l'enseignant
+                </h1>
+                <a href="{% url 'users:teacher_list' %}" class="btn btn-outline-secondary">
+                    <i class="fas fa-arrow-left me-2"></i>Retour à la liste
+                </a>
+            </div>
+            <hr class="my-4">
+        </div>
+    </div>
+
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <div class="card shadow-sm border-0">
+                <div class="card-body p-4">
+                    <div class="text-center mb-4">
+                        <div class="position-relative d-inline-block">
+                            {% if teacher.profile_picture %}
+                                <img src="{{ teacher.profile_picture.url }}" class="rounded-circle img-thumbnail" width="120" height="120" alt="Photo de profil">
+                            {% else %}
+                                <div class="rounded-circle bg-light d-flex align-items-center justify-content-center" style="width: 120px; height: 120px; border: 1px solid #dee2e6;">
+                                    <span class="display-4 text-muted">
+                                        {{ teacher.first_name|first|default:teacher.username.0|upper }}
+                                    </span>
+                                </div>
+                            {% endif %}
+                            <label for="id_profile_picture" class="btn btn-primary btn-sm rounded-circle position-absolute" style="bottom: 10px; right: 10px;" title="Changer la photo">
+                                <i class="fas fa-camera"></i>
+                            </label>
+                        </div>
+                        <h4 class="mt-3 mb-0">{{ teacher.get_full_name|default:teacher.username }}</h4>
+                        <p class="text-muted">@{{ teacher.username }}</p>
+                    </div>
+
+                    <form method="POST" enctype="multipart/form-data" class="needs-validation" novalidate>
+                        {% csrf_token %}
+                        
+                        <!-- Champ de téléchargement de photo caché -->
+                        <input type="file" id="id_profile_picture" name="profile_picture" class="d-none" accept="image/*">
+                        
+                        <div class="row g-3">
+                            <!-- Informations de base -->
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="id_username" class="form-label">Nom d'utilisateur *</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="fas fa-at"></i></span>
+                                        <input type="text" class="form-control {% if form.username.errors %}is-invalid{% endif %}" 
+                                               id="id_username" name="username" value="{{ form.username.value|default:teacher.username }}" required>
+                                    </div>
+                                    {% for error in form.username.errors %}
+                                        <div class="invalid-feedback d-block">{{ error }}</div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="id_email" class="form-label">Adresse email *</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="fas fa-envelope"></i></span>
+                                        <input type="email" class="form-control {% if form.email.errors %}is-invalid{% endif %}" 
+                                               id="id_email" name="email" value="{{ form.email.value|default:teacher.email }}" required>
+                                    </div>
+                                    {% for error in form.email.errors %}
+                                        <div class="invalid-feedback d-block">{{ error }}</div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="id_first_name" class="form-label">Prénom</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="fas fa-user"></i></span>
+                                        <input type="text" class="form-control {% if form.first_name.errors %}is-invalid{% endif %}" 
+                                               id="id_first_name" name="first_name" value="{{ form.first_name.value|default:teacher.first_name }}">
+                                    </div>
+                                    {% for error in form.first_name.errors %}
+                                        <div class="invalid-feedback d-block">{{ error }}</div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="id_last_name" class="form-label">Nom</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="fas fa-user"></i></span>
+                                        <input type="text" class="form-control {% if form.last_name.errors %}is-invalid{% endif %}" 
+                                               id="id_last_name" name="last_name" value="{{ form.last_name.value|default:teacher.last_name }}">
+                                    </div>
+                                    {% for error in form.last_name.errors %}
+                                        <div class="invalid-feedback d-block">{{ error }}</div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            
+                            <div class="col-12">
+                                <div class="form-group">
+                                    <label for="id_bio" class="form-label">À propos / Spécialités</label>
+                                    <textarea class="form-control {% if form.bio.errors %}is-invalid{% endif %}" 
+                                              id="id_bio" name="bio" rows="3">{{ form.bio.value|default:teacher.bio|default:'' }}</textarea>
+                                    {% for error in form.bio.errors %}
+                                        <div class="invalid-feedback d-block">{{ error }}</div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            
+                          
+                            
+                            <div class="col-12 mt-4">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div class="form-check form-switch">
+                                        
+                                    </div>
+                                    <div>
+                                        <a href="{% url 'users:teacher_list' %}" class="btn btn-outline-secondary me-2">
+                                            <i class="fas fa-times me-2"></i>Annuler
+                                        </a>
+                                        <button type="submit" class="btn btn-primary">
+                                            <i class="fas fa-save me-2"></i>Enregistrer les modifications
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Styles spécifiques à la page -->
+<style>
+    .page-header {
+        margin-bottom: 2rem;
+    }
+    
+    .img-thumbnail {
+        object-fit: cover;
+    }
+    
+    .password-strength .progress {
+        background-color: #e9ecef;
+        border-radius: 2px;
+    }
+    
+    .password-strength .progress-bar {
+        transition: width 0.3s ease;
+    }
+    
+    .toggle-password {
+        cursor: pointer;
+    }
+    
+    .form-label {
+        font-weight: 500;
+        margin-bottom: 0.5rem;
+    }
+    
+    .input-group-text {
+        min-width: 40px;
+        justify-content: center;
+    }
+    
+    .card {
+        border: none;
+        border-radius: 0.5rem;
+        overflow: hidden;
+    }
+    
+    .card.bg-light {
+        background-color: #f8f9fa !important;
+    }
+    
+    .invalid-feedback {
+        display: none;
+        width: 100%;
+        margin-top: 0.25rem;
+        font-size: 0.875em;
+        color: #dc3545;
+    }
+    
+    .was-validated .form-control:invalid ~ .invalid-feedback,
+    .form-control.is-invalid ~ .invalid-feedback {
+        display: block;
+    }
+    
+    .was-validated .form-control:valid ~ .valid-feedback,
+    .form-control.is-valid ~ .valid-feedback {
+        display: block;
+    }
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Activer la validation des formulaires Bootstrap
+    (function () {
+        'use strict'
+        
+        // Récupérer tous les formulaires auxquels nous voulons ajouter la validation
+        var forms = document.querySelectorAll('.needs-validation')
+        
+        // Boucler sur les formulaires et empêcher la soumission
+        Array.prototype.slice.call(forms).forEach(function (form) {
+            form.addEventListener('submit', function (event) {
+                if (!form.checkValidity()) {
+                    event.preventDefault()
+                    event.stopPropagation()
+                }
+                
+                form.classList.add('was-validated')
+            }, false)
+        })
+        
+        // Gestion du changement de photo de profil
+        const profilePictureInput = document.getElementById('id_profile_picture');
+        if (profilePictureInput) {
+            profilePictureInput.addEventListener('change', function(e) {
+                if (this.files && this.files[0]) {
+                    const reader = new FileReader();
+                    
+                    reader.onload = function(e) {
+                        const img = document.querySelector('#avatar-preview img');
+                        if (img) {
+                            img.src = e.target.result;
+                        } else {
+                            const avatarPreview = document.getElementById('avatar-preview');
+                            const newImg = document.createElement('img');
+                            newImg.src = e.target.result;
+                            newImg.alt = 'Photo de profil';
+                            newImg.className = 'rounded-circle img-thumbnail';
+                            newImg.width = 120;
+                            newImg.height = 120;
+                            avatarPreview.innerHTML = '';
+                            avatarPreview.appendChild(newImg);
+                        }
+                    }
+                    
+                    reader.readAsDataURL(this.files[0]);
+                }
+            });
+        }
+        
+        // Gestion de l'affichage/masquage des mots de passe
+        const togglePasswordButtons = document.querySelectorAll('.toggle-password');
+        togglePasswordButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                const input = this.parentElement.querySelector('input');
+                const icon = this.querySelector('i');
+                
+                if (input.type === 'password') {
+                    input.type = 'text';
+                    icon.classList.remove('fa-eye');
+                    icon.classList.add('fa-eye-slash');
+                } else {
+                    input.type = 'password';
+                    icon.classList.remove('fa-eye-slash');
+                    icon.classList.add('fa-eye');
+                }
+            });
+        });
+        
+        // Vérification de la force du mot de passe
+        const password1 = document.getElementById('id_password1');
+        if (password1) {
+            password1.addEventListener('input', function() {
+                checkPasswordStrength(this.value);
+            });
+        }
+        
+        // Vérification de la correspondance des mots de passe
+        const password2 = document.getElementById('id_password2');
+        if (password2) {
+            password2.addEventListener('input', checkPasswordMatch);
+        }
+        
+        // Fonction pour vérifier la force du mot de passe
+        function checkPasswordStrength(password) {
+            let strength = 0;
+            const strengthBar = document.querySelector('.password-strength .progress-bar');
+            const strengthText = document.getElementById('password-strength-text');
+            
+            if (!password) {
+                strengthBar.style.width = '0%';
+                strengthBar.className = 'progress-bar';
+                strengthText.textContent = 'Force du mot de passe';
+                return;
+            }
+            
+            // Vérifier la longueur
+            if (password.length >= 8) strength += 25;
+            if (password.length >= 12) strength += 25;
+            
+            // Vérifier la complexité
+            if (password.match(/[a-z]+/)) strength += 10;
+            if (password.match(/[A-Z]+/)) strength += 10;
+            if (password.match(/[0-9]+/)) strength += 15;
+            if (password.match(/[!@#$%^&*(),.?":{}|<>]+/)) strength += 15;
+            
+            // Mettre à jour la barre de force
+            strengthBar.style.width = Math.min(strength, 100) + '%';
+            
+            // Mettre à jour la couleur et le texte
+            if (strength < 50) {
+                strengthBar.className = 'progress-bar bg-danger';
+                strengthText.textContent = 'Faible';
+            } else if (strength < 75) {
+                strengthBar.className = 'progress-bar bg-warning';
+                strengthText.textContent = 'Moyen';
+            } else {
+                strengthBar.className = 'progress-bar bg-success';
+                strengthText.textContent = 'Fort';
+            }
+        }
+        
+        // Fonction pour vérifier la correspondance des mots de passe
+        function checkPasswordMatch() {
+            const password1 = document.getElementById('id_password1').value;
+            const password2 = document.getElementById('id_password2').value;
+            const matchDiv = document.getElementById('password-match');
+            
+            if (!password2) {
+                matchDiv.textContent = '';
+                return;
+            }
+            
+            if (password1 === password2) {
+                matchDiv.innerHTML = '<span class="text-success"><i class="fas fa-check-circle me-1"></i>Les mots de passe correspondent</span>';
+            } else {
+                matchDiv.innerHTML = '<span class="text-danger"><i class="fas fa-times-circle me-1"></i>Les mots de passe ne correspondent pas</span>';
+            }
+        }
+    })()
+</script>
+{% endblock %}

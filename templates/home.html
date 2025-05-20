@@ -1,0 +1,664 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block extra_css %}
+<style>
+    :root {
+        --primary-color: #226D68;
+        --primary-light: #2d8a84;
+        --primary-dark: #1a5854;
+        --secondary-color: #1a5854;
+        --text-color: #333;
+        --light-bg: #f8f9fa;
+    }
+
+    .hero-section {
+        background: transparent;
+        padding: 8rem 0;
+        position: relative;
+    }
+
+    .hero-section h1 {
+        font-size: 3.5rem;
+        font-weight: 700;
+        margin-bottom: 1.5rem;
+        color: var(--text-color);
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+        position: relative;
+        text-align: center;
+    }
+
+    .hero-section h1::after {
+        content: '';
+        position: absolute;
+        bottom: -10px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 80%;
+        height: 5px;
+        background: linear-gradient(90deg, var(--primary-color), var(--primary-dark));
+        border-radius: 2px;
+    }
+
+    .hero-section .lead {
+        font-size: 1.25rem;
+        text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
+    }
+
+    .hero-section .btn {
+        padding: 0.75rem 1.5rem;
+        position: relative;
+        text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
+    }
+
+    .hero-section .btn-primary {
+        background-color: var(--primary-color);
+        border-color: var(--primary-color);
+        transition: all 0.3s ease;
+        box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .hero-section .btn-primary:hover {
+        background-color: var(--primary-dark);
+        border-color: var(--primary-dark);
+        transform: translateY(-2px);
+        box-shadow: 4px 4px 6px rgba(0, 0, 0, 0.2);
+    }
+
+    .hero-section .btn-outline-light {
+        color: white;
+        border-color: var(--primary-color);
+        transition: all 0.3s ease;
+        box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+        background-color: transparent;
+    }
+
+    .hero-section .btn-outline-light:hover {
+        background-color: rgba(255, 255, 255, 0.1);
+        color: white;
+        transform: translateY(-2px);
+        box-shadow: 4px 4px 6px rgba(0, 0, 0, 0.2);
+    }
+
+    .hero-section .btn-primary {
+        background-color: var(--primary-color);
+        border-color: var(--primary-color);
+        transition: all 0.3s ease;
+    }
+
+    .hero-section .btn-primary:hover {
+        background-color: var(--primary-dark);
+        border-color: var(--primary-dark);
+        transform: translateY(-2px);
+    }
+
+    .hero-section .btn-outline-light {
+        color: var(--primary-color);
+        border-color: var(--primary-color);
+        transition: all 0.3s ease;
+    }
+
+    .hero-section .btn-outline-light:hover {
+        background-color: var(--primary-light);
+        color: white;
+        transform: translateY(-2px);
+    }
+
+    .feature-card {
+        transition: transform 0.3s ease;
+        border: none;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        border-radius: 15px;
+        padding: 2rem;
+    }
+
+    .feature-card:hover {
+        transform: translateY(-5px);
+    }
+
+    .stat-card {
+        background: white;
+        border: none;
+        border-radius: 15px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        padding: 1.5rem;
+        height: 100%;
+    }
+
+    .stat-card h2 {
+        font-size: 2.5rem;
+        margin: 0.5rem 0;
+        color: var(--primary-color);
+    }
+
+    .stat-card i {
+        font-size: 2.5rem;
+        color: var(--primary-color);
+    }
+
+    .dashboard-card {
+        background: linear-gradient(135deg, var(--light-bg) 0%, rgba(255, 255, 255, 0.95) 100%);
+        border: none;
+        border-radius: 15px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+        backdrop-filter: blur(10px);
+    }
+
+    .dashboard-card h5 {
+        margin-bottom: 1rem;
+        color: var(--text-color);
+    }
+
+    .action-card {
+        border-radius: 0 !important; /* Square corners */
+        border: 2px solid transparent;
+        height: 100%;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .action-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+    }
+
+    .border-teal {
+        border-color: #226D68;
+    }
+
+    .text-teal {
+        color: #226D68;
+    }
+
+    .border-primary {
+        border-color: var(--primary-color);
+    }
+
+    .chart-container {
+        height: 400px;
+        background: white;
+    }
+
+    @media (max-width: 768px) {
+        .hero-section {
+            padding: 4rem 0;
+        }
+
+        .hero-section h1 {
+            font-size: 2.5rem;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+{% if not user.is_authenticated %}
+<!-- Visiteur non connecté -->
+<div class="hero-section">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-12 text-center">
+                <h1 class="display-4 fw-bold">Bienvenue sur E-Learning</h1>
+                <p class="lead mb-4">
+                    Apprenez à votre rythme avec des cours en ligne de qualité.<br>
+                    Rejoignez notre communauté d'étudiants et d'enseignants passionnés.
+                </p>
+                <div class="d-grid gap-3 d-md-flex justify-content-center">
+                    <a href="{% url 'users:signup' %}" class="btn btn-primary btn-lg px-4 me-md-2">
+                        <i class="bi bi-person-plus me-2"></i>S'inscrire
+                    </a>
+                    <a href="{% url 'users:login' %}" class="btn btn-outline-light btn-lg px-4">
+                        <i class="bi bi-box-arrow-in-right me-2"></i>Se connecter
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Section Caractéristiques -->
+<div class="container py-5">
+   
+    <div class="row g-4">
+        <div class="col-md-4">
+            <div class="feature-card text-center">
+                <i class="bi bi-book-half display-1 mb-3"></i>
+                <h3>Cours de qualité</h3>
+                <p>Accédez à des cours élaborés par des experts dans leur domaine avec des certifications reconnues.</p>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="feature-card text-center">
+                <i class="bi bi-people display-1 mb-3"></i>
+                <h3>Communauté active</h3>
+                <p>Interagissez avec des étudiants et enseignants du monde entier grâce à notre forum et chat en direct.</p>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="feature-card text-center">
+                <i class="bi bi-clock-history display-1 mb-3"></i>
+                <h3>Apprendre à son rythme</h3>
+                <p>Suivez les cours quand vous le souhaitez, où que vous soyez, avec notre application mobile.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% elif user.is_superuser %}
+<!-- Tableau de bord Superuser -->
+<div class="container-fluid py-4">
+    <div class="row mb-4">
+        <div class="col-12">
+            <small class="text-muted">Bienvenue {{ user.username }} </small>
+        </div>
+    </div>
+
+    <div class="row g-4 mb-5">
+        <div class="col-md-3">
+            <div class="stat-card">
+                <i class="bi bi-people-fill"></i>
+                <h2>{{ total_users }}</h2>
+                <p class="mb-0">Utilisateurs</p>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stat-card">
+                <i class="bi bi-book"></i>
+                <h2>{{ total_courses }}</h2>
+                <p class="mb-0">Cours</p>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stat-card">
+                <i class="bi bi-mortarboard"></i>
+                <h2>{{ total_students }}</h2>
+                <p class="mb-0">Étudiants</p>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stat-card">
+                <i class="bi bi-person-workspace"></i>
+                <h2>{{ total_teachers }}</h2>
+                <p class="mb-0">Enseignants</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-4 mb-3">
+            <a href="{% url 'users:student_list' %}" class="btn btn-primary w-100 py-3">
+                <i class="bi bi-people-fill me-2"></i>Gérer les etudiants
+            </a>
+        </div>
+        <div class="col-md-4 mb-3">
+            <a href="{% url 'courses:course_list' %}" class="btn btn-primary w-100 py-3">
+                <i class="bi bi-journal-bookmark-fill me-2"></i>Gérer les cours
+            </a>
+        </div>
+        <div class="col-md-4 mb-3">
+            <a href="{% url 'users:teacher_list' %}" class="btn btn-primary w-100 py-3">
+                <i class="bi bi-shield-lock-fill me-2"></i>Gérer les enseignants
+            </a>
+        </div>
+    </div>
+</div>
+
+{% elif user.is_teacher %}
+<!-- Tableau de bord Enseignant -->
+<div class="container py-5">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h2>Bienvenue, {{ user.get_full_name|default:user.username }}</h2>
+            <p class="text-muted">Votre espace enseignant</p>
+        </div>
+    </div>
+
+    <div class="row g-4 mb-5">
+        <div class="col-md-4">
+            <div class="stat-card text-center">
+                <i class="fas fa-book"></i>
+                <h2>{{ teacher_courses_count|default:"0" }}</h2>
+                <p class="mb-0">Vos cours</p>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="stat-card text-center">
+                <i class="fas fa-users"></i>
+                <h2>{{ teacher_students_count|default:"0" }}</h2>
+                <p class="mb-0">Étudiants inscrits</p>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="stat-card text-center">
+                <i class="fas fa-file-alt"></i>
+                <h2>{{ teacher_resources_count|default:"0" }}</h2>
+                <p class="mb-0">Ressources</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mb-5">
+        <div class="col-12">
+            <div class="dashboard-card">
+                <h5 class="card-title" style="font-size: 1.25rem; font-weight: 600; color: #226D68; border-bottom: 2px solid #226D68; padding-bottom: 0.5rem; margin-bottom: 1.25rem;">
+                    <i class="fas fa-bolt me-2"></i>Actions rapides
+                </h5>
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        <a href="{% url 'courses:course_create' %}" class="text-decoration-none">
+                            <div class="action-card text-center p-4" style="background: linear-gradient(135deg, #226D68 0%, #1a5854 100%); color: white; border: none; box-shadow: 0 6px 12px rgba(26, 88, 84, 0.3);">
+                                <i class="fas fa-plus-circle fa-2x mb-3"></i>
+                                <h6 class="mb-0 fw-bold">Créer un nouveau cours</h6>
+                            </div>
+                        </a>
+                    </div>
+                    <div class="col-md-4">
+                        <a href="{% url 'courses:course_list' %}" class="text-decoration-none">
+                            <div class="action-card text-center p-4" style="border: 2px solid #226D68; color: #226D68; background-color: rgba(34, 109, 104, 0.05); box-shadow: 0 4px 8px rgba(26, 88, 84, 0.15);">
+                                <i class="fas fa-book fa-2x mb-3"></i>
+                                <h6 class="mb-0 fw-bold">Gérer mes cours</h6>
+                                <small class="mt-2 d-block">Voir et modifier vos cours</small>
+                            </div>
+                        </a>
+                    </div>
+                    <div class="col-md-4">
+                        <a href="{% url 'users:profile' %}" class="text-decoration-none">
+                            <div class="action-card text-center p-4" style="border: 2px solid #6c757d; color: #6c757d; background-color: rgba(108, 117, 125, 0.05); box-shadow: 0 4px 8px rgba(108, 117, 125, 0.15);">
+                                <i class="fas fa-user-edit fa-2x mb-3"></i>
+                                <h6 class="mb-0 fw-bold">Modifier mon profil</h6>
+                                <small class="mt-2 d-block">Mettre à jour vos informations</small>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+</div>
+
+{% elif user.is_student %}
+<!-- Tableau de bord Étudiant -->
+<div class="container py-5">
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="dashboard-header p-4 rounded" style="background-color: #226D68; color: white;">
+                <h2 class="mb-2">Bienvenue, {{ user.get_full_name|default:user.username }}</h2>
+                <p class="mb-0">Votre espace d'apprentissage personnalisé</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4 mb-5">
+        <div class="col-md-3">
+            <div class="stat-card text-center">
+                <i class="fas fa-book"></i>
+                <h2>{{ enrolled_courses_count|default:"0" }}</h2>
+                <p class="mb-0">Cours suivis</p>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stat-card text-center">
+                <i class="fas fa-graduation-cap"></i>
+                <h2>{{ completed_courses_count|default:"0" }}</h2>
+                <p class="mb-0">Cours complétés</p>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stat-card text-center">
+                <i class="fas fa-tasks"></i>
+                <h2>{{ user.submissions.count|default:"0" }}</h2>
+                <p class="mb-0">Soumissions</p>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stat-card text-center">
+                <i class="fas fa-check-circle"></i>
+                <h2>{{ validated_submissions_count|default:"0" }}</h2>
+                <p class="mb-0">Validées</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mb-5">
+        <div class="col-12">
+            <div class="dashboard-card">
+                <h5 class="card-title" style="font-size: 1.25rem; font-weight: 600; color: #226D68; border-bottom: 2px solid #226D68; padding-bottom: 0.5rem; margin-bottom: 1.25rem;">
+                    <i class="fas fa-bolt me-2"></i>Actions rapides
+                </h5>
+                <div class="row g-3">
+                    <div class="col-md-3">
+                        <a href="{% url 'courses:student_courses' %}" class="text-decoration-none">
+                            <div class="action-card text-center p-4" style="background: linear-gradient(135deg, #226D68 0%, #1a5854 100%); color: white; border: none; box-shadow: 0 6px 12px rgba(26, 88, 84, 0.3);">
+                                <i class="fas fa-bookmark fa-2x mb-3"></i>
+                                <h6 class="mb-0 fw-bold">Mes cours</h6>
+                                <small class="mt-2 d-block">Accéder à vos cours</small>
+                            </div>
+                        </a>
+                    </div>
+                    <div class="col-md-3">
+                        <a href="{% url 'courses:course_list' %}" class="text-decoration-none">
+                            <div class="action-card text-center p-4" style="border: 2px solid #226D68; color: #226D68; background-color: rgba(34, 109, 104, 0.05); box-shadow: 0 4px 8px rgba(26, 88, 84, 0.15);">
+                                <i class="fas fa-book-open fa-2x mb-3"></i>
+                                <h6 class="mb-0 fw-bold">Découvrir des cours</h6>
+                                <small class="mt-2 d-block">Explorer le catalogue</small>
+                            </div>
+                        </a>
+                    </div>
+                    <div class="col-md-3">
+                        <a href="{% url 'courses:student_grades' %}" class="text-decoration-none">
+                            <div class="action-card text-center p-4" style="border: 2px solid #226D68; color: #226D68; background-color: rgba(34, 109, 104, 0.05); box-shadow: 0 4px 8px rgba(26, 88, 84, 0.15);">
+                                <i class="fas fa-graduation-cap fa-2x mb-3"></i>
+                                <h6 class="mb-0 fw-bold">Mes notes</h6>
+                                <small class="mt-2 d-block">Voir vos résultats</small>
+                            </div>
+                        </a>
+                    </div>
+                    <div class="col-md-3">
+                        <a href="{% url 'users:profile' %}" class="text-decoration-none">
+                            <div class="action-card text-center p-4" style="border: 2px solid #6c757d; color: #6c757d; background-color: rgba(108, 117, 125, 0.05); box-shadow: 0 4px 8px rgba(108, 117, 125, 0.15);">
+                                <i class="fas fa-user-edit fa-2x mb-3"></i>
+                                <h6 class="mb-0 fw-bold">Mon profil</h6>
+                                <small class="mt-2 d-block">Gérer vos informations</small>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% if enrolled_courses %}
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <div class="d-flex justify-content-between align-items-center">
+                <h3 class="mb-0">Mes cours récents</h3>
+                <a href="{% url 'courses:student_courses' %}" class="btn btn-sm btn-link">Voir tous</a>
+            </div>
+            <hr>
+            <div class="list-group">
+                {% for enrollment in enrolled_courses|slice:":3" %}
+                <a href="{% url 'courses:course_detail' enrollment.course.pk %}" class="list-group-item list-group-item-action">
+                    <div class="d-flex w-100 justify-content-between">
+                        <h5 class="mb-1">{{ enrollment.course.title }}</h5>
+                        <span class="badge bg-primary rounded-pill">{{ enrollment.course.get_level_display }}</span>
+                    </div>
+                    <p class="mb-1 text-truncate">{{ enrollment.course.description }}</p>
+                    <small>
+                        <i class="fas fa-user-tie me-1"></i>{{ enrollment.course.teacher.get_full_name }}
+                        <span class="ms-3"><i class="fas fa-calendar-alt me-1"></i>Inscrit le {{ enrollment.enrolled_at|date:"d/m/Y" }}</span>
+                    </small>
+                </a>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="d-flex justify-content-between align-items-center">
+                <h3 class="mb-0">Mes dernières soumissions</h3>
+                <a href="{% url 'courses:student_grades' %}" class="btn btn-sm btn-link">Voir toutes</a>
+            </div>
+            <hr>
+            {% with submissions=user.submissions.all|dictsortreversed:"submitted_at"|slice:":3" %}
+                {% if submissions %}
+                <div class="list-group">
+                    {% for submission in submissions %}
+                    <div class="list-group-item">
+                        <div class="d-flex w-100 justify-content-between">
+                            <h5 class="mb-1">{{ submission.assignment.title }}</h5>
+                            {% if submission.status == 'validated' %}
+                                <span class="badge bg-success">Validé</span>
+                            {% elif submission.status == 'rejected' %}
+                                <span class="badge bg-danger">Non validé</span>
+                            {% else %}
+                                <span class="badge bg-warning text-dark">À vérifier</span>
+                            {% endif %}
+                        </div>
+                        <p class="mb-1">
+                            <small class="text-muted">Cours: {{ submission.assignment.course.title }}</small>
+                        </p>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <small>
+                                <i class="fas fa-calendar-alt me-1"></i>{{ submission.submitted_at|date:"d/m/Y H:i" }}
+                            </small>
+                            {% if submission.grade %}
+                                <span class="badge {% if submission.grade >= 10 %}bg-success{% else %}bg-danger{% endif %}">
+                                    {{ submission.grade }}/20
+                                </span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle me-2"></i>Vous n'avez pas encore soumis de travaux.
+                </div>
+                {% endif %}
+            {% endwith %}
+        </div>
+    </div>
+
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header bg-light">
+                    <h4 class="mb-0">Cours recommandés pour vous</h4>
+                </div>
+                <div class="card-body">
+                    <div class="row g-4">
+                        {% for course in courses_list|slice:":3" %}
+                            {% with is_enrolled=False %}
+                                {% for enrollment in enrolled_courses %}
+                                    {% if enrollment.course.id == course.id %}
+                                        {% with is_enrolled=True %}{% endwith %}
+                                    {% endif %}
+                                {% endfor %}
+
+                                {% if not is_enrolled %}
+                                <div class="col-md-4">
+                                    <div class="card h-100">
+                                        <div class="card-body">
+                                            <h5 class="card-title">{{ course.title }}</h5>
+                                            <p class="card-text">{{ course.description|truncatechars:100 }}</p>
+                                            <div class="d-flex justify-content-between align-items-center">
+                                                <span class="badge bg-primary">{{ course.get_level_display }}</span>
+                                                <small class="text-muted">{{ course.teacher.get_full_name }}</small>
+                                            </div>
+                                        </div>
+                                        <div class="card-footer bg-transparent border-top-0">
+                                            <a href="{% url 'courses:course_detail' course.pk %}" class="btn btn-sm btn-outline-primary">Découvrir</a>
+                                        </div>
+                                    </div>
+                                </div>
+                                {% endif %}
+                            {% endwith %}
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <div class="row">
+        <div class="col-md-6 mx-auto text-center py-5">
+            <div class="empty-state">
+                <i class="fas fa-graduation-cap fa-4x mb-3" style="color: #226D68;"></i>
+                <h3>Vous êtes les biensVenues!</h3>
+                <p class="text-muted mb-4">Découvrez notre catalogue de cours et commencez à apprendre</p>
+                <a href="{% url 'courses:course_list' %}" class="btn btn-primary btn-lg">
+                    <i class="fas fa-book-open me-2"></i>Explorer les cours
+                </a>
+            </div>
+        </div>
+    </div>
+
+    {% endif %}
+</div>
+
+{% else %}
+<!-- Utilisateur connecté mais ni étudiant ni enseignant ni admin -->
+<div class="container py-5">
+    <div class="row mb-4">
+        <div class="col-12 text-center">
+            <h2>Bienvenue, {{ user.get_full_name|default:user.username }}</h2>
+            <p class="lead">Merci de vous être connecté à notre plateforme d'apprentissage en ligne.</p>
+        </div>
+    </div>
+
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-body text-center py-5">
+                    <i class="fas fa-info-circle fa-4x mb-3 text-primary"></i>
+                    <h3>Votre compte est en attente de configuration</h3>
+                    <p class="text-muted mb-4">Votre compte n'est pas encore configuré comme étudiant ou enseignant. Veuillez contacter l'administrateur pour plus d'informations.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    // Configuration du graphique des cours
+    const ctx = document.getElementById('coursesChart')?.getContext('2d');
+    if(ctx) {
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: ['Débutant', 'Intermédiaire', 'Avancé'],
+                datasets: [{
+                    label: 'Nombre de cours',
+                    data: [{{ courses_beginner }}, {{ courses_intermediate }}, {{ courses_advanced }}],
+                    backgroundColor: [
+                        'rgba(34, 109, 104, 0.8)',
+                        'rgba(34, 109, 104, 0.6)',
+                        'rgba(34, 109, 104, 0.4)'
+                    ],
+                    borderColor: 'rgba(34, 109, 104, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+    }
+</script>
+{% endblock %}

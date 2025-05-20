@@ -1,0 +1,206 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="mb-1">{{ assignment.title }}</h2>
+            <p class="text-muted mb-0">Cours : {{ course.title }}</p>
+        </div>
+        <a href="{% url 'courses:course_detail' course.pk %}" class="btn btn-outline-secondary">
+            <i class="fas fa-arrow-left"></i> Retour au cours
+        </a>
+    </div>
+
+    <div class="card shadow-sm">
+        <div class="card-header bg-teal">
+            <h5 class="mb-0">
+                <i class="fas fa-list-check me-2"></i>Liste des soumissions
+            </h5>
+        </div>
+        <div class="card-body">
+            {% if submissions %}
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Étudiant</th>
+                                <th>Date de soumission</th>
+                                <th>Note</th>
+                                <th>Statut</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for submission in submissions %}
+                            <tr>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <div class="avatar-sm me-3">
+                                            <span class="avatar-title rounded-circle bg-soft-teal text-teal">
+                                                {{ submission.student.first_name|first|upper }}{{ submission.student.last_name|first|upper }}
+                                            </span>
+                                        </div>
+                                        <div>
+                                            <h6 class="mb-0">{{ submission.student.get_full_name|default:submission.student.username }}</h6>
+                                            <small class="text-muted">{{ submission.student.username }}</small>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>{{ submission.submitted_at|date:"d/m/Y H:i" }}</td>
+                                <td>
+                                    {% if submission.grade is not None %}
+                                        <div class="d-flex align-items-center">
+                                            <span class="badge bg-teal me-2">{{ submission.grade }}/20</span>
+                                            {% if submission.grade >= 10 %}
+                                                <small class="text-success"><i class="fas fa-check-circle me-1"></i>Réussite</small>
+                                            {% else %}
+                                                <small class="text-danger"><i class="fas fa-times-circle me-1"></i>Échec</small>
+                                            {% endif %}
+                                        </div>
+                                    {% else %}
+                                        <span class="badge bg-secondary">Non noté</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if submission.status == 'validated' %}
+                                        <span class="badge bg-success">
+                                            <i class="fas fa-check-circle me-1"></i>Validé
+                                        </span>
+                                        {% if submission.validated_at %}
+                                            <div class="small text-muted mt-1">
+                                                <i class="far fa-clock me-1"></i>{{ submission.validated_at|date:"d/m/Y" }}
+                                            </div>
+                                        {% endif %}
+                                    {% elif submission.status == 'rejected' %}
+                                        <span class="badge bg-danger">
+                                            <i class="fas fa-times-circle me-1"></i>Non validé
+                                        </span>
+                                        {% if submission.validated_at %}
+                                            <div class="small text-muted mt-1">
+                                                <i class="far fa-clock me-1"></i>{{ submission.validated_at|date:"d/m/Y" }}
+                                            </div>
+                                        {% endif %}
+                                    {% else %}
+                                        <span class="badge bg-warning text-dark">
+                                            <i class="fas fa-clock me-1"></i>À vérifier
+                                        </span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if submission.file %}
+                                        <a href="{{ submission.file.url }}" class="btn btn-sm btn-outline-teal me-1" title="Télécharger la soumission">
+                                            <i class="fas fa-download"></i>
+                                        </a>
+                                    {% endif %}
+
+                                    {% if user.is_teacher and course.teacher == user or user.is_superuser %}
+                                        <div class="btn-group">
+                                            <div>
+                                                <form method="post" action="{% url 'courses:validate_submission' course.pk assignment.pk submission.pk %}" class="d-flex align-items-center mb-2">
+                                                    {% csrf_token %}
+                                                    <input type="hidden" name="action" value="grade">
+                                                    <div class="input-group input-group-sm me-2" style="width: 120px;">
+                                                        <input type="number" class="form-control" name="grade" min="0" max="20" step="0.5" value="{{ submission.grade|default:'' }}" placeholder="Note/20" required>
+                                                    </div>
+                                                    <button type="submit" class="btn btn-sm btn-primary">
+                                                        <i class="fas fa-save me-1"></i> Noter
+                                                    </button>
+                                                </form>
+
+                                            </div>
+                                        </div>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div class="text-center py-4">
+                    <img src="{% static 'images/empty-state.svg' %}" alt="Aucune soumission" class="img-fluid mb-3" style="max-height: 200px;">
+                    <h5 class="text-muted">Aucune soumission pour ce TP/TD</h5>
+                    <p class="text-muted">Les étudiants n'ont pas encore soumis leur travail.</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<style>
+    .avatar-sm {
+        width: 40px;
+        height: 40px;
+        line-height: 40px;
+        text-align: center;
+        border-radius: 50%;
+        font-weight: 600;
+    }
+    .table th {
+        border-top: none;
+        font-weight: 600;
+        text-transform: uppercase;
+        font-size: 0.75rem;
+        letter-spacing: 0.5px;
+    }
+    .card {
+        border: none;
+        border-radius: 10px;
+        overflow: hidden;
+    }
+    .card-header {
+        border-bottom: 1px solid rgba(0,0,0,.125);
+    }
+
+    /* Teal theme colors */
+    .bg-teal {
+        background-color: #226D68 !important;
+        color: white !important;
+    }
+
+    .text-teal {
+        color: #226D68 !important;
+    }
+
+    .bg-soft-teal {
+        background-color: rgba(34, 109, 104, 0.1) !important;
+    }
+
+    .btn-outline-teal {
+        color: #226D68 !important;
+        border-color: #226D68 !important;
+    }
+
+    .btn-outline-teal:hover {
+        background-color: #226D68 !important;
+        color: white !important;
+    }
+
+    .btn-teal {
+        background-color: #226D68 !important;
+        border-color: #226D68 !important;
+        color: white !important;
+    }
+
+    .btn-teal:hover {
+        background-color: #1a5450 !important;
+        border-color: #1a5450 !important;
+    }
+
+    /* Disable number input spinners */
+    input[type=number]::-webkit-inner-spin-button,
+    input[type=number]::-webkit-outer-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+    }
+
+    input[type=number] {
+        -moz-appearance: textfield;
+    }
+</style>
+{% endblock %}
+
+{% block scripts %}
+{% endblock %}

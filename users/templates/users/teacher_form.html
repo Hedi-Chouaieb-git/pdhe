@@ -1,0 +1,511 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container">
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center">
+                <h1 class="h2 fw-bold text-primary mb-0">
+                    {% comment %} <i class="fas fa-chalkboard-teacher me-2"></i>{{ title }} {% endcomment %}
+                </h1>
+                <div>
+                    <a href="{{ cancel_url }}" class="btn btn-outline-secondary me-2">
+                        <i class="fas fa-arrow-left me-2"></i>Retour
+                    </a>
+                    <button type="submit" form="teacherForm" class="btn btn-primary">
+                        <i class="fas fa-save me-2"></i>{{ submit_text }}
+                    </button>
+                </div>
+            </div>
+            <hr class="mt-3 mb-4">
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Colonne de gauche - Photo de profil -->
+        <div class="col-lg-4 mb-4">
+            <div class="card shadow-sm h-100">
+                <div class="card-body text-center">
+                    <div class="position-relative d-inline-block mb-3">
+                        <div id="avatar-container" class="position-relative">
+                            <div id="avatar-preview" class="avatar-circle-lg bg-soft-primary text-primary d-flex align-items-center justify-content-center mx-auto overflow-hidden shadow-sm"
+                                 style="transition: all 0.3s ease; border: 2px solid #e9ecef;">
+                                {% if form.instance.profile_picture %}
+                                    <img src="{{ form.instance.profile_picture.url }}" alt="Photo de profil" class="w-100 h-100 object-fit-cover">
+                                {% else %}
+                                    <span class="display-4 text-primary">
+                                        {% if form.instance.first_name %}
+                                            {{ form.instance.first_name|first|upper }}
+                                        {% else %}
+                                            {{ form.instance.username|first|upper }}
+                                        {% endif %}
+                                    </span>
+                                {% endif %}
+                            </div>
+                            <div id="avatar-overlay" class="position-absolute top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center bg-dark bg-opacity-50 rounded-circle opacity-0"
+                                 style="transition: opacity 0.3s ease; pointer-events: none;">
+                                <i class="fas fa-camera text-white fa-lg"></i>
+                            </div>
+                            <div id="avatar-loading" class="position-absolute top-0 start-0 w-100 h-100 d-none align-items-center justify-content-center bg-dark bg-opacity-50 rounded-circle">
+                                <div class="spinner-border text-light" role="status">
+                                    <span class="visually-hidden">Chargement...</span>
+                                </div>
+                            </div>
+                        </div>
+                        <label for="id_profile_picture" class="btn btn-primary btn-sm rounded-circle position-absolute" style="bottom: 10px; right: 10px;" title="Changer la photo">
+                            <i class="fas fa-camera"></i>
+                        </label>
+                        <input type="file" id="id_profile_picture" name="profile_picture" class="d-none" accept="image/*">
+                        <div id="avatar-error" class="invalid-feedback d-block text-center mt-2"></div>
+                    </div>
+                    <h5 class="mb-1">{{ form.instance.get_full_name|default:"Nouvel enseignant" }}</h5>
+                    <p class="text-muted mb-0">@{{ form.instance.username|default:"nomutilisateur" }}</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Colonne de droite - Formulaire -->
+        <div class="col-lg-8">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    {% if form.non_field_errors %}
+                        <div class="alert alert-danger">
+                            {% for error in form.non_field_errors %}
+                                {{ error }}
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+
+                    <form method="POST" enctype="multipart/form-data" class="needs-validation" novalidate id="teacherForm">
+                        {% csrf_token %}
+
+                        <ul class="nav nav-tabs mb-4" id="teacherTabs" role="tablist">
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link active" id="info-tab" data-bs-toggle="tab" data-bs-target="#info" type="button" role="tab">
+                                    <i class="fas fa-user me-2"></i>Informations
+                                </button>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link" id="security-tab" data-bs-toggle="tab" data-bs-target="#security" type="button" role="tab">
+                                    <i class="fas fa-lock me-2"></i>Sécurité
+                                </button>
+                            </li>
+                        </ul>
+
+                        <div class="tab-content" id="teacherTabsContent">
+                            <!-- Onglet Informations -->
+                            <div class="tab-pane fade show active" id="info" role="tabpanel" aria-labelledby="info-tab">
+                                <div class="row g-3">
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label for="id_username" class="form-label">Nom d'utilisateur *</label>
+                                            <div class="input-group">
+                                                <span class="input-group-text"><i class="fas fa-at"></i></span>
+                                                <input type="text" class="form-control {% if form.username.errors %}is-invalid{% endif %}"
+                                                       id="id_username" name="username" value="{{ form.username.value|default:'' }}"
+                                                       {% if form.instance.pk %}readonly{% else %}required{% endif %}>
+                                            </div>
+                                            {% for error in form.username.errors %}
+                                                <div class="invalid-feedback d-block">{{ error }}</div>
+                                            {% endfor %}
+                                            <small class="form-text text-muted">Utilisé pour la connexion au système</small>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label for="id_email" class="form-label">Adresse email *</label>
+                                            <div class="input-group">
+                                                <span class="input-group-text"><i class="fas fa-envelope"></i></span>
+                                                <input type="email" class="form-control {% if form.email.errors %}is-invalid{% endif %}"
+                                                       id="id_email" name="email" value="{{ form.email.value|default:'' }}" required>
+                                            </div>
+                                            {% for error in form.email.errors %}
+                                                <div class="invalid-feedback d-block">{{ error }}</div>
+                                            {% endfor %}
+                                            <small class="form-text text-muted">L'enseignant recevra les notifications à cette adresse</small>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label for="id_first_name" class="form-label">Prénom</label>
+                                            <div class="input-group">
+                                                <span class="input-group-text"><i class="fas fa-user"></i></span>
+                                                <input type="text" class="form-control {% if form.first_name.errors %}is-invalid{% endif %}"
+                                                       id="id_first_name" name="first_name" value="{{ form.first_name.value|default:'' }}">
+                                            </div>
+                                            {% for error in form.first_name.errors %}
+                                                <div class="invalid-feedback d-block">{{ error }}</div>
+                                            {% endfor %}
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label for="id_last_name" class="form-label">Nom</label>
+                                            <div class="input-group">
+                                                <span class="input-group-text"><i class="fas fa-user"></i></span>
+                                                <input type="text" class="form-control {% if form.last_name.errors %}is-invalid{% endif %}"
+                                                       id="id_last_name" name="last_name" value="{{ form.last_name.value|default:'' }}">
+                                            </div>
+                                            {% for error in form.last_name.errors %}
+                                                <div class="invalid-feedback d-block">{{ error }}</div>
+                                            {% endfor %}
+                                        </div>
+                                    </div>
+
+                                    <div class="col-12">
+                                        <div class="form-group">
+                                            <label for="id_bio" class="form-label">À propos / Spécialités</label>
+                                            <textarea class="form-control {% if form.bio.errors %}is-invalid{% endif %}"
+                                                      id="id_bio" name="bio" rows="3">{{ form.bio.value|default:'' }}</textarea>
+                                            {% for error in form.bio.errors %}
+                                                <div class="invalid-feedback d-block">{{ error }}</div>
+                                            {% endfor %}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+
+                            <div class="tab-pane fade" id="security" role="tabpanel" aria-labelledby="security-tab">
+                                <div class="alert alert-info">
+                                    <i class="fas fa-info-circle me-2"></i>
+                                    {% if form.instance.pk %}
+                                        Laissez ces champs vides si vous ne souhaitez pas modifier le mot de passe.
+                                    {% else %}
+                                        Le mot de passe doit contenir au moins 8 caractères, dont des chiffres et des lettres.
+                                    {% endif %}
+                                </div>
+
+                                <div class="row g-3">
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label for="id_password1" class="form-label">Nouveau mot de passe {% if not form.instance.pk %}*{% endif %}</label>
+                                            <div class="input-group">
+                                                <span class="input-group-text"><i class="fas fa-key"></i></span>
+                                                <input type="password" class="form-control {% if form.password1.errors %}is-invalid{% endif %}"
+                                                       id="id_password1" name="password1" {% if not form.instance.pk %}required{% endif %}>
+                                                <button class="btn btn-outline-secondary toggle-password" type="button" data-target="id_password1">
+                                                    <i class="far fa-eye"></i>
+                                                </button>
+                                            </div>
+                                            <div class="password-strength mt-2">
+                                                <div class="progress" style="height: 4px;">
+                                                    <div class="progress-bar" role="progressbar" style="width: 0%;"></div>
+                                                </div>
+                                                <small class="form-text" id="password-strength-text">Force du mot de passe</small>
+                                            </div>
+                                            {% for error in form.password1.errors %}
+                                                <div class="invalid-feedback d-block">{{ error }}</div>
+                                            {% endfor %}
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label for="id_password2" class="form-label">Confirmer le mot de passe {% if not form.instance.pk %}*{% endif %}</label>
+                                            <div class="input-group">
+                                                <span class="input-group-text"><i class="fas fa-check-double"></i></span>
+                                                <input type="password" class="form-control {% if form.password2.errors %}is-invalid{% endif %}"
+                                                       id="id_password2" name="password2" {% if not form.instance.pk %}required{% endif %}>
+                                                <button class="btn btn-outline-secondary toggle-password" type="button" data-target="id_password2">
+                                                    <i class="far fa-eye"></i>
+                                                </button>
+                                            </div>
+                                            <div class="d-flex align-items-center mt-1">
+                                                <i id="password-match-icon" class="fas fa-check-circle text-success me-1 d-none"></i>
+                                                <small id="password-match-text" class="text-muted"></small>
+                                            </div>
+                                            {% for error in form.password2.errors %}
+                                                <div class="invalid-feedback d-block">{{ error }}</div>
+                                            {% endfor %}
+                                        </div>
+                                    </div>
+
+                                    <div class="col-12 mt-3">
+                                        <div class="form-check form-switch">
+                                            <input class="form-check-input" type="checkbox" id="id_send_welcome_email" name="send_welcome_email" {% if not form.instance.pk %}checked{% endif %}>
+                                            <label class="form-check-label" for="id_send_welcome_email">
+                                                Envoyer un email de bienvenue avec les informations de connexion
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="d-flex justify-content-between align-items-center mt-5 pt-3 border-top">
+                            <div>
+                                <!-- Espace réservé pour d'autres contrôles si nécessaire -->
+                            </div>
+                            <div>
+                                <a href="{{ cancel_url }}" class="btn btn-outline-secondary me-2">
+                                    <i class="fas fa-times me-2"></i>Annuler
+                                </a>
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-save me-2"></i>{{ submit_text }}
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Activer la validation des formulaires Bootstrap
+    (function () {
+        'use strict'
+
+        // Récupérer tous les formulaires auxquels nous voulons appliquer les styles de validation Bootstrap personnalisés
+        var forms = document.querySelectorAll('.needs-validation')
+
+        // Boucler dessus et empêcher la soumission
+        Array.prototype.slice.call(forms).forEach(function (form) {
+            form.addEventListener('submit', function (event) {
+                if (!form.checkValidity()) {
+                    event.preventDefault()
+                    event.stopPropagation()
+                }
+
+                form.classList.add('was-validated')
+            }, false)
+        })
+    })()
+
+    // Gestion de l'upload de l'avatar
+    document.addEventListener('DOMContentLoaded', function() {
+        const avatarInput = document.getElementById('id_profile_picture');
+        const avatarPreview = document.getElementById('avatar-preview');
+        const avatarContainer = document.getElementById('avatar-container');
+        const avatarOverlay = document.getElementById('avatar-overlay');
+        const avatarLoading = document.getElementById('avatar-loading');
+        const avatarError = document.getElementById('avatar-error');
+
+        // Gestion du survol de l'avatar
+        if (avatarContainer && avatarOverlay) {
+            avatarContainer.addEventListener('mouseenter', function() {
+                if (avatarOverlay) avatarOverlay.classList.remove('opacity-0');
+            });
+
+            avatarContainer.addEventListener('mouseleave', function() {
+                if (avatarOverlay) avatarOverlay.classList.add('opacity-0');
+            });
+        }
+
+        if (avatarInput) {
+            avatarInput.addEventListener('change', function(e) {
+                const file = e.target.files[0];
+                if (!file) return;
+
+                // Afficher l'indicateur de chargement
+                if (avatarLoading) avatarLoading.classList.remove('d-none');
+                if (avatarError) avatarError.textContent = '';
+
+                // Vérification de la taille du fichier (max 5MB)
+                const maxSize = 5 * 1024 * 1024; // 5MB
+                if (file.size > maxSize) {
+                    showAvatarError('La taille du fichier ne doit pas dépasser 5MB');
+                    resetAvatarInput();
+                    return;
+                }
+
+                // Vérification du type de fichier
+                const validTypes = ['image/jpeg', 'image/png', 'image/gif'];
+                if (!validTypes.includes(file.type)) {
+                    showAvatarError('Format d\'image non supporté. Utilisez JPEG, PNG ou GIF.');
+                    resetAvatarInput();
+                    return;
+                }
+
+                // Prévisualisation de l'image
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    // Créer une nouvelle image pour vérifier ses dimensions
+                    const img = new Image();
+                    img.onload = function() {
+                        // Vérifier les dimensions minimales (200x200 pixels)
+                        if (this.width < 200 || this.height < 200) {
+                            showAvatarError('L\'image doit faire au moins 200x200 pixels');
+                            resetAvatarInput();
+                            return;
+                        }
+
+                        // Mettre à jour l'aperçu
+                        avatarPreview.innerHTML = `
+                            <img src="${e.target.result}"
+                                 alt="Photo de profil"
+                                 class="w-100 h-100 object-fit-cover">
+                        `;
+
+                        // Cacher l'indicateur de chargement
+                        if (avatarLoading) avatarLoading.classList.add('d-none');
+                    };
+
+                    img.onerror = function() {
+                        showAvatarError('Impossible de charger l\'image');
+                        resetAvatarInput();
+                    };
+
+                    img.src = e.target.result;
+                };
+
+                reader.onerror = function() {
+                    showAvatarError('Erreur lors de la lecture du fichier');
+                    resetAvatarInput();
+                };
+
+                reader.readAsDataURL(file);
+            });
+        }
+
+        function showAvatarError(message) {
+            if (avatarError) {
+                avatarError.textContent = message;
+                avatarError.style.display = 'block';
+            }
+            if (avatarLoading) avatarLoading.classList.add('d-none');
+        }
+
+        function resetAvatarInput() {
+            if (avatarInput) avatarInput.value = '';
+            if (avatarLoading) avatarLoading.classList.add('d-none');
+        }
+
+
+
+        // Mettre à jour l'avatar avec l'initiale du prénom ou du nom d'utilisateur
+        function updateAvatarInitial() {
+            const firstName = document.getElementById('id_first_name');
+            const username = document.getElementById('id_username');
+            const avatarInitial = avatarPreview.querySelector('.display-4');
+
+            if (avatarInitial && firstName && firstName.value) {
+                avatarInitial.textContent = firstName.value.charAt(0).toUpperCase();
+            } else if (avatarInitial && username && username.value) {
+                avatarInitial.textContent = username.value.charAt(0).toUpperCase();
+            }
+        }
+
+        // Écouter les changements sur les champs de formulaire
+        const firstNameInput = document.getElementById('id_first_name');
+        const usernameInput = document.getElementById('id_username');
+
+        if (firstNameInput) {
+            firstNameInput.addEventListener('input', updateAvatarInitial);
+        }
+
+        if (usernameInput) {
+            usernameInput.addEventListener('input', updateAvatarInitial);
+        }
+
+        // Basculer la visibilité du mot de passe
+        document.querySelectorAll('.toggle-password').forEach(button => {
+            button.addEventListener('click', function() {
+                const targetId = this.getAttribute('data-target');
+                const targetInput = document.getElementById(targetId);
+                const icon = this.querySelector('i');
+
+                if (targetInput.type === 'password') {
+                    targetInput.type = 'text';
+                    icon.classList.remove('fa-eye');
+                    icon.classList.add('fa-eye-slash');
+                } else {
+                    targetInput.type = 'password';
+                    icon.classList.remove('fa-eye-slash');
+                    icon.classList.add('fa-eye');
+                }
+            });
+        });
+
+        // Gestion du switch d'activation du compte
+        const isActiveCheckbox = document.getElementById('id_is_active');
+        const isActiveLabel = document.querySelector('label[for="id_is_active"]');
+
+
+        // Vérification de la force du mot de passe
+        const password1 = document.getElementById('id_password1');
+        const password2 = document.getElementById('id_password2');
+        const strengthBar = document.querySelector('.password-strength .progress-bar');
+        const strengthText = document.getElementById('password-strength-text');
+        const matchIcon = document.getElementById('password-match-icon');
+        const matchText = document.getElementById('password-match-text');
+
+        if (password1) {
+            password1.addEventListener('input', function() {
+                const strength = checkPasswordStrength(this.value);
+                updateStrengthIndicator(strength);
+                checkPasswordMatch();
+            });
+        }
+
+        if (password2) {
+            password2.addEventListener('input', checkPasswordMatch);
+        }
+
+        function checkPasswordStrength(password) {
+            let strength = 0;
+
+            // Longueur minimale
+            if (password.length >= 8) strength += 1;
+
+            // Contient des lettres minuscules et majuscules
+            if (password.match(/([a-z].*[A-Z])|([A-Z].*[a-z])/)) strength += 1;
+
+            // Contient des chiffres
+            if (password.match(/([0-9])/)) strength += 1;
+
+            // Contient des caractères spéciaux
+            if (password.match(/([!,%,&,@,#,$,^,*,?,_,~])/)) strength += 1;
+
+            return strength;
+        }
+
+        function updateStrengthIndicator(strength) {
+            const strengthClasses = ['bg-danger', 'bg-warning', 'bg-info', 'bg-success'];
+            const strengthTexts = ['Très faible', 'Faible', 'Moyen', 'Fort'];
+
+            // Mettre à jour la barre de progression
+            const width = (strength / 4) * 100;
+            strengthBar.style.width = `${width}%`;
+
+            // Mettre à jour la classe de couleur
+            strengthBar.className = 'progress-bar';
+            if (strength > 0) {
+                strengthBar.classList.add(strengthClasses[strength - 1]);
+            }
+
+            // Mettre à jour le texte
+            if (strength === 0) {
+                strengthText.textContent = 'Force du mot de passe';
+                strengthText.className = 'form-text';
+            } else {
+                strengthText.textContent = strengthTexts[strength - 1];
+                strengthText.className = `form-text text-${strengthClasses[strength - 1].replace('bg-', '')}`;
+            }
+        }
+
+        function checkPasswordMatch() {
+            if (password1 && password2) {
+                if (password2.value.length > 0) {
+                    if (password1.value === password2.value) {
+                        matchIcon.classList.remove('d-none');
+                        matchText.classList.remove('d-none');
+                        password2.classList.remove('is-invalid');
+                    } else {
+                        matchIcon.classList.add('d-none');
+                        matchText.classList.add('d-none');
+                        password2.classList.add('is-invalid');
+                    }
+                }
+            }
+        }
+    });
+</script>
+{% endblock %}

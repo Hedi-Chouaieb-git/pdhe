@@ -1,0 +1,317 @@
+{% extends 'base.html' %}
+
+{% block title %}Mes Notes{% endblock %}
+
+{% block extra_css %}
+<style>
+    :root {
+        --primary-color: #226D68;
+        --primary-light: rgba(34, 109, 104, 0.1);
+        --success-color: #28a745;
+        --danger-color: #dc3545;
+        --warning-color: #ffc107;
+    }
+    
+    .grades-header {
+        background-color: var(--primary-color);
+        color: white;
+        padding: 2rem 0;
+        margin-bottom: 2rem;
+        border-radius: 0.5rem;
+    }
+    
+    .stats-card {
+        background-color: white;
+        border-radius: 0.5rem;
+        box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+        transition: transform 0.3s ease;
+    }
+    
+    .stats-card:hover {
+        transform: translateY(-5px);
+    }
+    
+    .stats-icon {
+        width: 48px;
+        height: 48px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 1rem;
+    }
+    
+    .stats-number {
+        font-size: 2rem;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+    }
+    
+    .stats-label {
+        color: #6c757d;
+        font-size: 0.875rem;
+    }
+    
+    .course-card {
+        background-color: white;
+        border-radius: 0.5rem;
+        box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+        margin-bottom: 1.5rem;
+        overflow: hidden;
+    }
+    
+    .course-header {
+        background-color: var(--primary-color);
+        color: white;
+        padding: 1rem 1.5rem;
+        font-weight: 600;
+    }
+    
+    .course-body {
+        padding: 1.5rem;
+    }
+    
+    .course-stats {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1rem;
+        margin-bottom: 1rem;
+    }
+    
+    .course-stat {
+        background-color: var(--primary-light);
+        border-radius: 0.5rem;
+        padding: 0.75rem 1rem;
+        flex: 1;
+        min-width: 120px;
+    }
+    
+    .course-stat-label {
+        font-size: 0.75rem;
+        color: #6c757d;
+        margin-bottom: 0.25rem;
+    }
+    
+    .course-stat-value {
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: var(--primary-color);
+    }
+    
+    .submission-table {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0;
+    }
+    
+    .submission-table th {
+        background-color: #f8f9fa;
+        padding: 0.75rem;
+        font-weight: 600;
+        text-align: left;
+        border-bottom: 2px solid #dee2e6;
+    }
+    
+    .submission-table td {
+        padding: 0.75rem;
+        border-bottom: 1px solid #dee2e6;
+        vertical-align: middle;
+    }
+    
+    .submission-table tr:last-child td {
+        border-bottom: none;
+    }
+    
+    .badge-validated {
+        background-color: var(--success-color);
+        color: white;
+    }
+    
+    .badge-rejected {
+        background-color: var(--danger-color);
+        color: white;
+    }
+    
+    .badge-pending {
+        background-color: var(--warning-color);
+        color: #212529;
+    }
+    
+    .grade-pill {
+        display: inline-block;
+        padding: 0.25rem 0.75rem;
+        border-radius: 1rem;
+        font-weight: 600;
+    }
+    
+    .grade-good {
+        background-color: rgba(40, 167, 69, 0.1);
+        color: var(--success-color);
+    }
+    
+    .grade-bad {
+        background-color: rgba(220, 53, 69, 0.1);
+        color: var(--danger-color);
+    }
+    
+    .empty-state {
+        text-align: center;
+        padding: 3rem 1rem;
+    }
+    
+    .empty-state i {
+        font-size: 3rem;
+        color: #dee2e6;
+        margin-bottom: 1rem;
+    }
+    
+    .empty-state p {
+        color: #6c757d;
+        margin-bottom: 1.5rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <!-- En-tête de la page -->
+    <div class="grades-header text-center">
+        <h1 class="h2 mb-3">
+            <i class="fas fa-graduation-cap me-2"></i>Mon Relevé de Notes
+        </h1>
+        <p class="lead mb-0">Consultez vos notes et le statut de vos soumissions</p>
+    </div>
+    
+    <!-- Statistiques générales -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="stats-card text-center">
+                <div class="stats-icon bg-primary text-white mx-auto">
+                    <i class="fas fa-file-alt"></i>
+                </div>
+                <div class="stats-number">{{ total_submissions }}</div>
+                <div class="stats-label">Soumissions totales</div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stats-card text-center">
+                <div class="stats-icon bg-success text-white mx-auto">
+                    <i class="fas fa-check-circle"></i>
+                </div>
+                <div class="stats-number">{{ validated_submissions }}</div>
+                <div class="stats-label">Soumissions validées</div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stats-card text-center">
+                <div class="stats-icon bg-danger text-white mx-auto">
+                    <i class="fas fa-times-circle"></i>
+                </div>
+                <div class="stats-number">{{ rejected_submissions }}</div>
+                <div class="stats-label">Soumissions rejetées</div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stats-card text-center">
+                <div class="stats-icon bg-warning text-dark mx-auto">
+                    <i class="fas fa-clock"></i>
+                </div>
+                <div class="stats-number">{{ pending_submissions }}</div>
+                <div class="stats-label">En attente</div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Liste des cours -->
+    {% if courses_data %}
+        {% for course_data in courses_data %}
+            <div class="course-card">
+                <div class="course-header d-flex justify-content-between align-items-center">
+                    <div>
+                        <i class="fas fa-book me-2"></i>{{ course_data.course.title }}
+                    </div>
+                    <a href="{% url 'courses:course_detail' course_data.course.pk %}" class="btn btn-sm btn-outline-light">
+                        <i class="fas fa-external-link-alt me-1"></i>Voir le cours
+                    </a>
+                </div>
+                <div class="course-body">
+                    <div class="course-stats">
+                        <div class="course-stat">
+                            <div class="course-stat-label">Moyenne</div>
+                            <div class="course-stat-value">{{ course_data.average_grade }}/20</div>
+                        </div>
+                        <div class="course-stat">
+                            <div class="course-stat-label">Soumissions</div>
+                            <div class="course-stat-value">{{ course_data.total_submissions }}</div>
+                        </div>
+                        <div class="course-stat">
+                            <div class="course-stat-label">Validées</div>
+                            <div class="course-stat-value">{{ course_data.validated_count }}</div>
+                        </div>
+                        <div class="course-stat">
+                            <div class="course-stat-label">Rejetées</div>
+                            <div class="course-stat-value">{{ course_data.rejected_count }}</div>
+                        </div>
+                    </div>
+                    
+                    <table class="submission-table">
+                        <thead>
+                            <tr>
+                                <th>TP/TD</th>
+                                <th>Date</th>
+                                <th>Note</th>
+                                <th>Statut</th>
+                                <th>Commentaire</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for submission in course_data.submissions %}
+                                <tr>
+                                    <td>{{ submission.assignment.title }}</td>
+                                    <td>{{ submission.submitted_at|date:"d/m/Y H:i" }}</td>
+                                    <td>
+                                        {% if submission.grade is not None %}
+                                            <span class="grade-pill {% if submission.grade >= 10 %}grade-good{% else %}grade-bad{% endif %}">
+                                                {{ submission.grade }}/20
+                                            </span>
+                                        {% else %}
+                                            <span class="text-muted">Non noté</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if submission.status == 'validated' %}
+                                            <span class="badge badge-validated">Validé</span>
+                                        {% elif submission.status == 'rejected' %}
+                                            <span class="badge badge-rejected">Non validé</span>
+                                        {% else %}
+                                            <span class="badge badge-pending">À vérifier</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if submission.feedback %}
+                                            {{ submission.feedback }}
+                                        {% else %}
+                                            <span class="text-muted">Aucun commentaire</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        {% endfor %}
+    {% else %}
+        <div class="empty-state">
+            <i class="fas fa-file-alt"></i>
+            <h3 class="h5 mb-3">Aucune soumission trouvée</h3>
+            <p>Vous n'avez pas encore soumis de travaux pour vos cours.</p>
+            <a href="{% url 'courses:student_courses' %}" class="btn btn-primary">
+                <i class="fas fa-book me-2"></i>Voir mes cours
+            </a>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}
